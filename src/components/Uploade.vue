@@ -158,7 +158,6 @@ export default defineComponent({
         const uploadedFile = files[0]
         if (props.beforeUpload) {
           const result = props.beforeUpload(uploadedFile)
-          console.log(result, '---')
           if (result && result instanceof Promise) {
             result.then(processedFile => {
               if (processedFile instanceof File) {
