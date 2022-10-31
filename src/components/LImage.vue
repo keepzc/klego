@@ -1,28 +1,21 @@
 <template>
-  <img 
-    :style="styleProps" 
-    class="l-image-component" 
-    @click.prevent="handleClick"
-    :src="src"
-  >
+  <img :style="styleProps" class="l-image-component" @click.prevent="handleClick" :src="src">
 </template>
-
 <script lang="ts">
-import {defineComponent} from 'vue'
+import { defineComponent } from 'vue'
 import { transformToComponentProps, imageDefaultProps, imageStylePropsNames } from '../defaultProps'
 import useComponentCommon from '../hooks/useComponentCommon'
 const defaultProps = transformToComponentProps(imageDefaultProps)
 export default defineComponent({
-  name:'l-image',
-  props:{
+  name: 'l-image',
+  props: {
     ...defaultProps
   },
-  setup (props) {
-    const { styleProps, handleClick} = useComponentCommon(props, imageStylePropsNames)
-    console.log(styleProps)
+  setup(props) {
+    const { styleProps, handleClick } = useComponentCommon(props, imageStylePropsNames)
     return {
-       styleProps,
-       handleClick
+      styleProps,
+      handleClick
     }
   }
 })

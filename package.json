@@ -12,6 +12,7 @@
     "ant-design-vue": "^2.2.8",
     "axios": "^0.26.1",
     "core-js": "^3.6.5",
+    "lodash-es": "^4.17.21",
     "vue": "^3.0.0",
     "vue-router": "^4.0.14",
     "vuex": "^4.0.2"
@@ -29,7 +30,7 @@
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
-    "@vue/test-utils": "^2.0.0-beta.14",
+    "@vue/test-utils": "2.0.0-beta.14",
     "@vue/vue3-jest": "^27.0.0-alpha.1",
     "babel-jest": "^27.0.6",
     "eslint": "^6.7.2",

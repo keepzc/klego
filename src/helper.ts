@@ -34,10 +34,10 @@ export const commonUploadCheck = (file: File) => {
     return passed;
 };
 
-export const getImageDimensions = (url: string | File) => {
+export const getImageDimensions = (params: string | File) => {
     return new Promise<{ width: number; height: number }>((resolve, reject) => {
         const img = new Image();
-        img.src = typeof url === "string" ? url : URL.createObjectURL(url);
+        img.src = typeof params === "string" ? params : URL.createObjectURL(params);
         img.addEventListener("load", () => {
             const { naturalWidth: width, naturalHeight: height } = img;
             resolve({ width, height });
