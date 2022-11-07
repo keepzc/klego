@@ -1,7 +1,8 @@
 import { Module } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 import { GlobalDataProps } from "./index";
-import { TextComponentProps, ImageComponentProps } from "../defaultProps";
+// import { TextComponentProps, ImageComponentProps } from "../defaultProps";
+import {AllComponentProps } from 'kpzc-lego-components'
 export interface EditorProps {
     //编辑器渲染数组
     components: ComponentData[];
@@ -10,13 +11,25 @@ export interface EditorProps {
     //其他信息
 }
 
+export interface PageProps {
+    backgroundColor: string;
+    backgroundImage: string;
+    backgroundRepeat: string;
+    backgroundSize: string;
+    height: string;
+}
+export type AllFormProps = PageProps & AllComponentProps
+export interface PageData{
+    props: PageProps;
+    title: string;
+}
 export interface ComponentData {
     //这个元素属性
-    props: Partial<TextComponentProps & ImageComponentProps>;
+    props: Partial<AllComponentProps>;
     //id uuid v4 生成
     id: string;
     //业务组件库名称 l-text,l-image 登登
-    name: "l-text" | "l-image";
+    name: "l-text" | "l-image" | "l-shape";
 }
 
 export const testComponents: ComponentData[] = [
@@ -59,7 +72,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         updateComponent(state, { key, value }) {
             const updatedComponent = state.components.find((component) => component.id === state.currentElement);
             if (updatedComponent) {
-                updatedComponent.props[key as keyof TextComponentProps] = value;
+                updatedComponent.props[key as keyof AllComponentProps] = value;
             }
         }
     },

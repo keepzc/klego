@@ -4,7 +4,7 @@
   </component>
 </template>
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent } from 'vue'
 import { transformToComponentProps, textDefaultProps, textStylePropNames } from '../defaultProps'
 import useComponentCommon from '../hooks/useComponentCommon'
 const defaultProps = transformToComponentProps(textDefaultProps)

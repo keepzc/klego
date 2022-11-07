@@ -11,10 +11,9 @@
 import { defineComponent } from 'vue'
 import { message } from 'ant-design-vue'
 import { v4 as uuidv4 } from 'uuid'
-import LText from '../components/LText.vue'
 import { ComponentData } from '../store/editor'
 import StyledUploader from '../components/StyledUploader.vue'
-import { imageDefaultProps, TextComponentProps } from '../defaultProps'
+import { imageDefaultProps, TextComponentProps } from 'kpzc-lego-components'
 import { UploadResp } from '../extraType'
 import { getImageDimensions } from '../helper'
 export default defineComponent({
@@ -25,7 +24,6 @@ export default defineComponent({
     }
   },
   components: {
-    LText,
     StyledUploader
   },
   emits: ['on-item-click'],

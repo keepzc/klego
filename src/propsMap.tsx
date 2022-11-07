@@ -1,5 +1,5 @@
 import { VNode } from "vue";
-import { TextComponentProps } from "./defaultProps";
+import {AllFormProps} from './store/editor'
 export interface PropToForm {
     component: string;
     extraProps?: { [key: string]: any };
@@ -13,7 +13,7 @@ export interface PropToForm {
 }
 
 export type PropsToForms = {
-    [p in keyof TextComponentProps]?: PropToForm;
+    [p in keyof AllFormProps]?: PropToForm;
 };
 
 const fontFamilyArr = [
@@ -69,5 +69,15 @@ export const mapPropsToForms: PropsToForms = {
     color: {
         component: "color-picker",
         text: "字体颜色"
+    },
+    fontWeight: {
+        component: 'icon-switch',
+        initalTransform: (v: string) => v === 'bold',
+        afterTransform: (e: boolean) => e ? 'bold' : 'normal',
+        valueProp: 'checked',
+        extraProps: { iconName: 'BoldOutlined', tip: '加粗' }
+    },
+    src: {
+        component: 'image-processer'
     }
 };
