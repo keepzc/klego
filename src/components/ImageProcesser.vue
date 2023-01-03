@@ -1,10 +1,21 @@
 <template>
     <div class="image-processer">
+        <a-modal title="裁剪图片" v-model:visible="showModal" @ok="handleOk" @cancel="showModal = false" okText="确认"
+            cancelText="取消">
+            <div class="image-cropper">
+                <img :src="baseImageUrl" id="processed-image" ref="cropperImg" />
+            </div>
+        </a-modal>
         <div class="image-preview" :style="{ backgroundImage: backgroundUrl }">
 
         </div>
         <div class="image-process">
             <StyledUploader @sucess="handleFileUploaded"></StyledUploader>
+            <a-button @click="showModal = true">
+                <template v-slot:icon>
+                    <ScissorOutlined />
+                </template>裁剪图片
+            </a-button>
             <a-button v-if="showDelete" type="danger" @click="handleDelete">
                 <template v-slot:icon>
                     <DeleteOutlined />
@@ -15,9 +26,10 @@
 </template>
   
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, ref, watch, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
-import { DeleteOutlined } from '@ant-design/icons-vue'
+import Cropper from 'cropperjs'
+import { DeleteOutlined, ScissorOutlined } from '@ant-design/icons-vue'
 import StyledUploader from './StyledUploader.vue'
 import { UploadResp } from '../extraType'
 export default defineComponent({
@@ -33,11 +45,35 @@ export default defineComponent({
     },
     components: {
         StyledUploader,
-        DeleteOutlined
+        DeleteOutlined,
+        ScissorOutlined
     },
     emits: ['change', 'uploaded'],
     setup(props, context) {
+        const showModal = ref(false)
         const backgroundUrl = computed(() => `url(${props.value})`)
+        const baseImageUrl = computed(() => props.value.split('?')[0])
+        const cropperImg = ref<null | HTMLImageElement>(null)
+
+        let cropper: Cropper
+        watch(showModal, async (newValue) => {
+            if (newValue) {
+                await nextTick()
+                console.log(cropperImg.value)
+                if (cropperImg.value) {
+                    cropper = new Cropper(cropperImg.value, {
+                        crop(event) {
+                            console.log(event);
+
+                        }
+                    })
+                }
+            } else {
+                if (cropper) {
+                    cropper.destroy()
+                }
+            }
+        })
         const handleDelete = () => {
             context.emit('change', '')
         }
@@ -47,10 +83,17 @@ export default defineComponent({
             context.emit('change', resp.data.url)
             context.emit('uploaded', data)
         }
+        const handleOk = () => {
+            showModal.value = false
+        }
         return {
+            showModal,
             backgroundUrl,
+            baseImageUrl,
             handleDelete,
-            handleFileUploaded
+            handleFileUploaded,
+            handleOk,
+            cropperImg
         }
     }
 })
@@ -75,5 +118,11 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+.image-cropper img {
+    display: block;
+    /* This rule is very important, please don't ignore this */
+    max-width: 100%;
 }
 </style>

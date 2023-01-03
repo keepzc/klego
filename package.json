@@ -12,6 +12,7 @@
     "ant-design-vue": "^2.2.8",
     "axios": "^0.26.1",
     "core-js": "^3.6.5",
+    "cropperjs": "^1.5.11",
     "kpzc-lego-components": "^1.0.4",
     "lodash-es": "^4.17.21",
     "vue": "^3.0.0",
