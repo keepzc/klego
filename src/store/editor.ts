@@ -30,17 +30,25 @@ export interface ComponentData {
     id: string;
     //业务组件库名称 l-text,l-image 登登
     name: "l-text" | "l-image" | "l-shape";
+    // 图层是否隐藏
+    isHidden?: boolean;
+    // 图层是否锁定
+    isLocked?: boolean;
+    // 图层名称
+    layerName?: string;
 }
 
 export const testComponents: ComponentData[] = [
     {
         id: uuidv4(),
         name: "l-text",
+        layerName:'图层1',
         props: { text: "hello", fontSize: "20px", color: "#000000", lineHeight: "1", textAlign: "left", fontFamily: "" }
     },
     {
         id: uuidv4(),
         name: "l-text",
+        layerName:'图层2',
         props: {
             text: "hello2",
             fontSize: "10px",
@@ -53,6 +61,7 @@ export const testComponents: ComponentData[] = [
     {
         id: uuidv4(),
         name: "l-text",
+        layerName:'图层3',
         props: { text: "hello3", fontSize: "16px" }
     }
 ];
@@ -69,10 +78,16 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         setActive(state, currentId: string) {
             state.currentElement = currentId;
         },
-        updateComponent(state, { key, value }) {
-            const updatedComponent = state.components.find((component) => component.id === state.currentElement);
+        updateComponent(state, { key, value ,id, isRoot}) {
+            const updatedComponent = state.components.find((component) => component.id === (id || state.currentElement));
             if (updatedComponent) {
-                updatedComponent.props[key as keyof AllComponentProps] = value;
+                if(isRoot) {
+                    // https://github.com/microsoft/TypeScript/issues/31663
+                    (updatedComponent as any)[key] = value
+                }else {
+                    updatedComponent.props[key as keyof AllComponentProps] = value;
+                }
+                
             }
         }
     },
