@@ -32,6 +32,12 @@ import Cropper from 'cropperjs'
 import { DeleteOutlined, ScissorOutlined } from '@ant-design/icons-vue'
 import StyledUploader from './StyledUploader.vue'
 import { UploadResp } from '../extraType'
+interface CropDataProps {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
 export default defineComponent({
     props: {
         value: {
@@ -56,15 +62,20 @@ export default defineComponent({
         const cropperImg = ref<null | HTMLImageElement>(null)
 
         let cropper: Cropper
+        let cropData: CropDataProps | null = null
         watch(showModal, async (newValue) => {
             if (newValue) {
                 await nextTick()
-                console.log(cropperImg.value)
                 if (cropperImg.value) {
                     cropper = new Cropper(cropperImg.value, {
                         crop(event) {
-                            console.log(event);
-
+                            const { x, y, width, height } = event.detail
+                            cropData = {
+                                x: Math.floor(x),
+                                y: Math.floor(y),
+                                width: Math.floor(width),
+                                height: Math.floor(height)
+                            }
                         }
                     })
                 }
@@ -84,6 +95,11 @@ export default defineComponent({
             context.emit('uploaded', data)
         }
         const handleOk = () => {
+            if (cropData) {
+                const { x, y, width, height } = cropData
+                const cropperUrl = baseImageUrl.value + `?x-oss-process=image/crop,x_${x},y_${y},w_${width},h_${height}`
+                context.emit('change', cropperUrl)
+            }
             showModal.value = false
         }
         return {
