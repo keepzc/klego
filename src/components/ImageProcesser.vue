@@ -28,6 +28,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref, watch, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
+import axios from 'axios'
 import Cropper from 'cropperjs'
 import { DeleteOutlined, ScissorOutlined } from '@ant-design/icons-vue'
 import StyledUploader from './StyledUploader.vue'
@@ -98,6 +99,21 @@ export default defineComponent({
             if (cropData) {
                 const { x, y, width, height } = cropData
                 const cropperUrl = baseImageUrl.value + `?x-oss-process=image/crop,x_${x},y_${y},w_${width},h_${height}`
+                // 不使用阿里云 oss， 拿到截图再次上传的处理方法
+                // cropper.getCroppedCanvas().toBlob((blob) => {
+                //     if (blob) {
+                //         const formData = new FormData()
+                //         formData.append('croppedImage', blob, 'test.png')
+                //         axios.post('http://123.57.138.48/api/upload/', formData, {
+                //             headers: {
+                //                 'Content-Type': 'multipart/form-data'
+                //             }
+                //         }).then(resp => {
+                //             context.emit('change', resp.data.data.url)
+                //             showModal.value = false
+                //         })
+                //     }
+                // })
                 context.emit('change', cropperUrl)
             }
             showModal.value = false
