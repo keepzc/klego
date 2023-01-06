@@ -28,7 +28,7 @@
                         <DragOutlined />
                     </template></a-button>
             </a-tooltip>
-            <span>{{ item.layerName }}</span>
+            <InlineEdit :value="item.layerName" @change="(value) => { handleChange(item.id, 'layerName', value) }" />
         </li>
     </ul>
 </template>
@@ -36,6 +36,7 @@
 import { defineComponent, PropType } from 'vue'
 import { EyeOutlined, EyeInvisibleOutlined, LockOutlined, UnlockOutlined, DragOutlined } from '@ant-design/icons-vue'
 import { ComponentData } from '../store/editor'
+import InlineEdit from '../components/InlineEdit.vue'
 export default defineComponent({
     props: {
         list: {
@@ -53,7 +54,8 @@ export default defineComponent({
         EyeInvisibleOutlined,
         LockOutlined,
         UnlockOutlined,
-        DragOutlined
+        DragOutlined,
+        InlineEdit
     },
     setup(props, context) {
         const handleClick = (id: string) => {

@@ -6,7 +6,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Uploade from '@/components/Uploade.vue'
 
 export default defineComponent({
   name: 'App',
