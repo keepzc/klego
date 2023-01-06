@@ -28,7 +28,8 @@
                         <DragOutlined />
                     </template></a-button>
             </a-tooltip>
-            <InlineEdit :value="item.layerName" @change="(value) => { handleChange(item.id, 'layerName', value) }" />
+            <InlineEdit :value="(item.layerName as string)"
+                @change="(value) => { handleChange(item.id, 'layerName', value) }" />
         </li>
     </ul>
 </template>
