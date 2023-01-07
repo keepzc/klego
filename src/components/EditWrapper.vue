@@ -2,6 +2,12 @@
   <div class="edit-wrapper" ref="editWrapper" :style="styles" @mousedown="startMove" @click="onItemClick(id)"
     :class="{ active: active, hidden: hidden }">
     <slot></slot>
+    <div class="resizers">
+      <div class='resizer top-left'></div>
+      <div class='resizer top-right'></div>
+      <div class='resizer bottom-left'></div>
+      <div class='resizer bottom-right' @mousedown.stop="startResize"></div>
+    </div>
   </div>
 </template>
 
@@ -48,9 +54,27 @@ export default defineComponent({
         left
       }
     }
+    // 元素缩放
+    const startResize = (e: MouseEvent) => {
+      const currentElement = editWrapper.value
+      const handleMove = (e: MouseEvent) => {
+        if (currentElement) {
+          const { left, top } = currentElement.getBoundingClientRect()
+          currentElement.style.width = e.clientX - left + 'px'
+          currentElement.style.height = e.clientY - top + 'px'
+        }
+      }
+      const handleMouseUp = (e: MouseEvent) => {
+        document.removeEventListener('mousemove', handleMove)
+        nextTick(() => {
+          document.removeEventListener('mouseup', handleMouseUp)
+        })
+      }
+      document.addEventListener('mousemove', handleMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    }
     const startMove = (e: MouseEvent) => {
       const currentElement = editWrapper.value
-
       if (currentElement) {
         const { left, top } = currentElement.getBoundingClientRect()
         gap.x = e.clientX - left
@@ -84,7 +108,8 @@ export default defineComponent({
       onItemClick,
       styles,
       editWrapper,
-      startMove
+      startMove,
+      startResize
     }
   }
 })
@@ -96,10 +121,13 @@ export default defineComponent({
   cursor: pointer;
   border: 1px solid transparent;
   user-select: none;
+  box-sizing: content-box !important;
 }
 
 .edit-wrapper>* {
   position: static !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .edit-wrapper:hover {
@@ -114,5 +142,46 @@ export default defineComponent({
   border: 1px solid #1890ff;
   user-select: none;
   z-index: 1500;
+}
+
+.edit-wrapper .resizers {
+  display: none;
+}
+
+.edit-wrapper.active .resizers {
+  display: block;
+}
+
+.edit-wrapper.active .resizers .resizer {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #1890ff;
+  position: absolute;
+}
+
+.edit-wrapper.active .resizers .resizer.top-left {
+  left: -5px;
+  top: -5px;
+  cursor: nwse-resize;
+}
+
+.edit-wrapper .resizers .resizer.top-right {
+  right: -5px;
+  top: -5px;
+  cursor: nesw-resize;
+}
+
+.edit-wrapper .resizers .resizer.bottom-left {
+  left: -5px;
+  bottom: -5px;
+  cursor: nesw-resize;
+}
+
+.edit-wrapper .resizers .resizer.bottom-right {
+  right: -5px;
+  bottom: -5px;
+  cursor: nwse-resize;
 }
 </style>
