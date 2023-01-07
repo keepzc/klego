@@ -12,7 +12,8 @@
           <div class="preview-list" id="canvas-area">
             <div class="body-container" :style="page.props">
               <edit-wrapper v-for="component in components" :id="component.id" :key="component.id"
-                @set-active="setActive" :active="component.id === currentElement?.id" :hidden="component.isHidden">
+                @set-active="setActive" @update-position="updatePosition" :active="component.id === currentElement?.id"
+                :props="component.props" :hidden="component.isHidden">
                 <component :is="component.name" v-bind="component.props" />
               </edit-wrapper>
             </div>
@@ -96,6 +97,11 @@ export default defineComponent({
       console.log('page', e)
       store.commit('updatePage', e)
     }
+    const updatePosition = (data: { left: number; top: number; id: string }) => {
+      const { left, top, id } = data
+      store.commit('updateComponent', { key: 'left', value: left + 'px', id })
+      store.commit('updateComponent', { key: 'top', value: top + 'px', id })
+    }
     return {
       components,
       defaultTextTemplates,
@@ -105,7 +111,8 @@ export default defineComponent({
       handleChange,
       pageChange,
       activePanel,
-      page
+      page,
+      updatePosition
     }
   }
 })

@@ -42,34 +42,29 @@ export interface ComponentData {
 }
 
 export const testComponents: ComponentData[] = [
-    {
-        id: uuidv4(),
-        name: "l-text",
-        layerName:'图层1',
-        props: {...textDefaultProps, text: "hello", fontSize: "20px", color: "#000000", lineHeight: "1", textAlign: "left", fontFamily: "" }
-    },
-    {
-        id: uuidv4(),
-        name: "l-text",
-        layerName:'图层2',
-        props: {
-            ...textDefaultProps,
-            text: "hello2",
-            fontSize: "10px",
-            fontWeight: "bold",
-            lineHeight: "2",
-            textAlign: "left",
-            fontFamily: ""
-        }
-    },
-    {
-        id: uuidv4(),
-        name: "l-text",
-        layerName:'图层3',
-        props: { ...textDefaultProps,text: "hello3", fontSize: "16px" }
-    }
+    { id: uuidv4(), name: 'l-text', layerName:'图层1', props: { ...textDefaultProps, text: 'hello', fontSize: '20px', color: '#000000', 'lineHeight': '1', textAlign: 'left', fontFamily: '', width: '100px', height: '100px', backgroundColor: '#efefef', left: '10px', top: '10px' }},
+    // {
+    //     id: uuidv4(),
+    //     name: "l-text",
+    //     layerName:'图层2',
+    //     props: {
+    //         ...textDefaultProps,
+    //         text: "hello2",
+    //         fontSize: "10px",
+    //         fontWeight: "bold",
+    //         lineHeight: "2",
+    //         textAlign: "left",
+    //         fontFamily: ""
+    //     }
+    // },
+    // {
+    //     id: uuidv4(),
+    //     name: "l-text",
+    //     layerName:'图层3',
+    //     props: { ...textDefaultProps,text: "hello3", fontSize: "16px" }
+    // }
 ];
-const pageDefaultProps = { backgroundColor: '#ffffff', backgroundImage: 'url("https://static.imooc-lego.com/upload-files/screenshot-677311.png")', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', height: '560px' }
+const pageDefaultProps = { backgroundColor: '#ffffff', backgroundImage: '', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', height: '560px' }
 const editor: Module<EditorProps, GlobalDataProps> = {
     state: {
         components: testComponents,
