@@ -57,6 +57,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from 'vue'
 import { useStore } from 'vuex'
+import { pickBy, forEach } from 'lodash-es'
 import { GlobalDataProps } from '../store/index'
 import ComponentsList from '../components/ComponentsList.vue'
 import EditWrapper from '@/components/EditWrapper.vue'
@@ -97,10 +98,12 @@ export default defineComponent({
       console.log('page', e)
       store.commit('updatePage', e)
     }
-    const updatePosition = (data: { left: number; top: number; id: string }) => {
-      const { left, top, id } = data
-      store.commit('updateComponent', { key: 'left', value: left + 'px', id })
-      store.commit('updateComponent', { key: 'top', value: top + 'px', id })
+    const updatePosition = (data: { width: number; height: number; left: number; top: number; id: string }) => {
+      const { id } = data
+      const updatedData = pickBy<number>(data, (v, k) => k !== 'id')
+      forEach(updatedData, (v, key) => {
+        store.commit('updateComponent', { key, value: v + 'px', id })
+      })
     }
     return {
       components,

@@ -56,7 +56,8 @@ export default defineComponent({
     const caculateMovePosition = (e: MouseEvent) => {
       const container = document.getElementById('canvas-area') as HTMLElement
       const left = e.clientX - gap.x - container.offsetLeft
-      const top = e.clientY - gap.y - container.offsetTop
+      // y轴有滚动条 ，top应该加上滚动条高度
+      const top = e.clientY - gap.y - container.offsetTop + container.scrollTop
       return {
         top,
         left
@@ -70,7 +71,7 @@ export default defineComponent({
       const leftWidth = right - clientX
       const bottomHeight = clientY - top
       const topHeight = bottom - clientY
-      const topOffset = clientY - container.offsetTop
+      const topOffset = clientY - container.offsetTop + container.scrollTop
       const leftOffset = clientX - container.offsetLeft
       switch (direction) {
         case 'top-left':
@@ -122,6 +123,8 @@ export default defineComponent({
       }
       const handleMouseUp = (e: MouseEvent) => {
         document.removeEventListener('mousemove', handleMove)
+        const size = caculateSize(direction, e, { left, right, top, bottom })
+        context.emit('update-position', { ...size, id: props.id })
         nextTick(() => {
           document.removeEventListener('mouseup', handleMouseUp)
         })
