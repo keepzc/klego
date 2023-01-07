@@ -13,6 +13,7 @@ import { message } from 'ant-design-vue'
 import ImageProcesser from './ImageProcesser.vue'
 import StyledUploader from './StyledUploader.vue'
 // import { RespUploadData } from '../store/respTypes'
+import { UploadResp } from '../extraType'
 export default defineComponent({
     props: {
         value: {
@@ -26,10 +27,10 @@ export default defineComponent({
     },
     emits: ['change'],
     setup(props, context) {
-        const onImageUploaded = (data: { resp: any; file: File }) => {
+        const onImageUploaded = (data: { resp: UploadResp; file: File }) => {
             const { resp } = data
             message.success('上传成功')
-            context.emit('change', resp.data.urls[0])
+            context.emit('change', resp.data.url)
         }
         const handleUploadUrl = (url: string) => {
             context.emit('change', url)

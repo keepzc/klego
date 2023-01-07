@@ -8,7 +8,8 @@ export interface EditorProps {
     components: ComponentData[];
     //当前编辑器那个元素
     currentElement: string;
-    //其他信息
+    // 当然最后保存的时候还有有一些项目信息，这里并没有写出，等做到的时候再补充
+    page: PageData;
 }
 
 export interface PageProps {
@@ -18,8 +19,10 @@ export interface PageProps {
     backgroundSize: string;
     height: string;
 }
+
 export type AllFormProps = PageProps & AllComponentProps
-export interface PageData{
+
+export interface PageData {
     props: PageProps;
     title: string;
 }
@@ -66,11 +69,15 @@ export const testComponents: ComponentData[] = [
         props: { ...textDefaultProps,text: "hello3", fontSize: "16px" }
     }
 ];
-
+const pageDefaultProps = { backgroundColor: '#ffffff', backgroundImage: 'url("https://static.imooc-lego.com/upload-files/screenshot-677311.png")', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', height: '560px' }
 const editor: Module<EditorProps, GlobalDataProps> = {
     state: {
         components: testComponents,
-        currentElement: ""
+        currentElement: "",
+        page: {
+            props: pageDefaultProps,
+            title: 'test title'
+        }
     },
     mutations: {
         addComponent(state, component: ComponentData) {
@@ -90,6 +97,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 }
                 
             }
+        },
+        updatePage(state, {key,value}) {
+            state.page.props[key as keyof PageProps] = value
         }
     },
     getters: {
