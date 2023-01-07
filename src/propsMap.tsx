@@ -175,6 +175,9 @@ export const mapPropsToForms: PropsToForms = {
         afterTransform: (e: number) => (e / 100),
         extraProps: { min: 0, max: 100, reverse: true }
     },
+    boxShadow: {
+        component: 'shadow-picker'
+    },
     // commonComponentProps - positions
     left: {
         ...pxToNumberHandler,
@@ -201,4 +204,23 @@ export const mapPropsToForms: PropsToForms = {
         afterTransform: (e: any) => e.target.value,
         text: '链接'
     },
+    backgroundImage: {
+        ...defaultHandler,
+        component: 'background-processer',
+        initalTransform: (v: string) => {
+          if (v) {
+            const reg = /\(["'](.+)["']\)/g
+            const matches = reg.exec(v)
+            if (matches && matches.length > 1) {
+              console.log(matches)
+              return matches[1]
+            } else {
+              return ''
+            }
+          } else {
+            return ''
+          }
+        },
+        afterTransform: (e: string) => e ? `url('${e}')` : ''
+    }
 };

@@ -1,8 +1,9 @@
 <template>
   <div class="props-table">
-    <div v-for="(value, key) in finalProps" :key="key" class="prop-item">
+    <div v-for="(value, key) in finalProps" :key="key" :class="{ 'no-text': !value.text }" :id="`item-${key}`"
+      class="prop-item">
       <span class="label" v-if="value.text">{{ value.text }}</span>
-      <div class="prop-component">
+      <div :class="`prop-component component-${value.component}`">
         <component :is="value.component" :[value.valueProp]="value.value" v-bind="value.extraProps" v-on="value.events">
           <template v-if="value.options">
             <component :is="value.subComponent" v-for="(option, k) in value.options" :key="k" :value="option.value">
@@ -25,6 +26,7 @@ import RenderVnode from './RenderVnode'
 import ColorPicker from './ColorPicker.vue'
 import ImageProcesser from './ImageProcesser.vue'
 import IconSwitch from './IconSwitch.vue'
+import ShadowPicker from './ShadowPicker.vue'
 interface FormProps {
   component: string;
   subComponent?: string;
@@ -47,7 +49,8 @@ export default defineComponent({
     RenderVnode,
     ColorPicker,
     ImageProcesser,
-    IconSwitch
+    IconSwitch,
+    ShadowPicker
   },
   emits: ['change'],
   name: 'props-table',
@@ -72,6 +75,7 @@ export default defineComponent({
         return result
       }, {} as { [key: string]: FormProps })
     })
+    console.log(finalProps);
 
     return {
       finalProps
@@ -93,5 +97,24 @@ export default defineComponent({
 
 .prop-component {
   width: 70%;
+}
+
+.prop-item.no-text {
+  display: inline-block;
+  margin: 0 10px 0 0;
+}
+
+#item-fontWeight {
+  margin-left: 28%;
+}
+
+.component-a-select .ant-select {
+  width: 150px;
+}
+
+.prop-component.component-shadow-picker,
+.prop-component.component-image-processer,
+.prop-component.component-background-processer {
+  width: 100%;
 }
 </style>
