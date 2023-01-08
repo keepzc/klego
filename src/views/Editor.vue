@@ -9,6 +9,7 @@
       <a-layout style="padding:0 24px 24px">
         <a-layout-content class="preview-container">
           <p>画布区域</p>
+          <history-area />
           <div class="preview-list" id="canvas-area">
             <div class="body-container" :style="page.props">
               <edit-wrapper v-for="component in components" :id="component.id" :key="component.id"
@@ -60,13 +61,15 @@ import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
 import { GlobalDataProps } from '../store/index'
+import { ComponentData } from '../store/editor'
 import ComponentsList from '../components/ComponentsList.vue'
 import EditWrapper from '@/components/EditWrapper.vue'
 import defaultTextTemplates from '../defaultTemplates'
 import PropsTable from '@/components/PropsTable.vue'
 import LayerList from '../components/LayerList.vue'
 import EditGroup from '../components/EditGroup.vue'
-import { ComponentData } from '../store/editor'
+import HistoryArea from './editor/HistoryArea.vue'
+
 
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
@@ -76,7 +79,8 @@ export default defineComponent({
     EditWrapper,
     PropsTable,
     LayerList,
-    EditGroup
+    EditGroup,
+    HistoryArea
   },
   setup() {
     initHotKeys()

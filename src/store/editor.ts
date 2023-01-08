@@ -11,9 +11,9 @@ export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 export interface HistoryProps{
     id: string;
     componentId: string;
-    type: 'add' | 'delete' | 'modify',
+    type: 'add' | 'delete' | 'modify';
     data: any;
-    index?: number
+    index?: number;
 }
 
 export interface EditorProps {
@@ -136,15 +136,17 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     // if delete a component, we should restore it to the right position
                     state.components = insertAt(state.components, history.index as number, history.data)
                     break;
-                case 'modify':
+                case 'modify':{
                     // get the modified component by id, restore to the old value
-                    const {componentId, data} = history
-                    const {key, oldValue} =data
+                    const { componentId, data } = history
+                    const { key, oldValue } = data
                     const updateComponent = state.components.find(component => component.id === componentId)
                     if(updateComponent){
                         updateComponent.props[key as keyof AllComponentProps] = oldValue
                     }
-                    break
+                    break;
+                }
+                    
                 default:
                     break;
             }
@@ -165,14 +167,15 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 case 'delete':
                     state.components = state.components.filter(component => component.id !== history.componentId)
                     break;
-                case 'modify':
-                    const {componentId, data} = history
-                    const {key, newValue} = data
-                    const  updateComponent = state.components.find(component => component.id === componentId)
+                case 'modify':{
+                    const { componentId, data } = history
+                    const { key, newValue } = data
+                    const updateComponent = state.components.find(component => component.id === componentId)
                     if(updateComponent){
                         updateComponent.props[key as keyof AllComponentProps] = newValue
                     }
                     break;
+                }
                 default:
                     break;
             }
