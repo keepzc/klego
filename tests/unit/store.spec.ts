@@ -5,6 +5,17 @@ import { clone, last, cloneDeep } from "lodash-es";
 import { textDefaultProps } from 'kpzc-lego-components'
 const cloneComponents = clone(testComponents);
 jest.mock('ant-design-vue')
+const getCurrentAndAssert = (text: string) => {
+    const currentElement: ComponentData =  store.getters.getCurrentElement
+    expect(currentElement.props.text).toBe(text)
+}
+const getLengthAndAssert = (length: number) => {
+    expect(store.state.editor.components.length).toBe(length)
+}
+const getLastAndAssert = (id: string) => {
+    const lastItem = last(store.state.editor.components)
+    expect(lastItem?.id).toBe(id)
+}
 describe("test vuex store", () => {
     it("should have three modules", () => {
         expect(store.state).toHaveProperty("editor");
@@ -92,5 +103,59 @@ describe("test vuex store", () => {
             store.commit('updateComponent', newProps2)
             expect(currentElement.layerName).toBe('new layer')
         });
+        it.only('undo should works fine', () => {
+            store.commit('resetEditor')
+            const payload: ComponentData = {
+                name: 'l-text',
+                id: '1234',
+                props: {
+                  ...textDefaultProps,
+                  text: 'text1'
+                }
+            }
+            store.commit('addComponent', payload)
+            const payload2: ComponentData = {
+                name: 'l-text',
+                id: '2345',
+                props: {
+                    ...textDefaultProps,
+                    text: 'text2'
+                }
+            }
+            store.commit('addComponent', payload2)
+            // delete component
+            store.commit('deleteComponent', '2345')
+            // update a component
+            store.commit('updateComponent', {key: 'text', value: 'update', id: '1234'})
+            store.commit('setActive', '1234')
+            getCurrentAndAssert('update')
+            // undo step 1, text should be back to text1
+            store.commit('undo')
+            getCurrentAndAssert('text1')
+             // undo step2, delete component should be back at the right position
+            getLengthAndAssert(1)
+            store.commit('undo')
+            getLengthAndAssert(2)
+            getLastAndAssert('2345')
+            // undo step3, the 2nd component should be deleted
+            store.commit('undo')
+            getLengthAndAssert(1)
+            getLastAndAssert('1234')
+            store.commit('undo')
+            getLengthAndAssert(0)
+
+            // redo
+            store.commit('redo')
+            getLengthAndAssert(1)
+            getLastAndAssert('1234')
+
+            store.commit('redo')
+            getLengthAndAssert(2)
+            getLastAndAssert('2345')
+
+            store.commit('redo')
+            store.commit('setActive', '1234')
+            getCurrentAndAssert('text1')
+        })
     });
 });
