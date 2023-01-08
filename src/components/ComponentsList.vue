@@ -71,4 +71,8 @@ export default defineComponent({
   margin: 0 auto;
   margin-bottom: 15px;
 }
+
+/* .component-item>* {
+  position: static !important;
+} */
 </style>

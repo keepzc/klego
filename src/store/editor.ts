@@ -2,9 +2,10 @@ import { Module } from "vuex";
 import {message} from 'ant-design-vue'
 import {cloneDeep} from 'lodash-es'
 import { v4 as uuidv4 } from "uuid";
-import { GlobalDataProps } from "./index";
+import store, { GlobalDataProps } from "./index";
 // import { TextComponentProps, ImageComponentProps } from "../defaultProps";
 import {AllComponentProps,textDefaultProps } from 'kpzc-lego-components'
+export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 export interface EditorProps {
     //编辑器渲染数组
     components: ComponentData[];
@@ -80,13 +81,14 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     },
     mutations: {
         addComponent(state, component: ComponentData) {
+            component.layerName = '图层' + (state.components.length + 1)
             state.components.push(component);
         },
         setActive(state, currentId: string) {
             state.currentElement = currentId;
         },
         copyComponent(state, id: string){
-            const currentComponent = state.components.find(component=> component.id === id)
+            const currentComponent = store.getters.getElement(id)
             if(currentComponent) {
                 state.copiedComponent = currentComponent
                 message.success('已拷贝当前图层', 1)
@@ -108,6 +110,38 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 message.success('删除当前图层成功', 1)
             }
         },
+        moveComponent(state, data: {direction: MoveDirection; amount: number; id: string}){
+            const currentComponent = state.components.find(component=> component.id === data.id)
+            if(currentComponent){
+                const oldTop = parseInt(currentComponent.props.top || '0') 
+                const oldLeft = parseInt(currentComponent.props.left || '0') 
+                const {direction, amount} = data
+                switch (direction) {
+                    case 'Up':{
+                        const newValue = oldTop - amount + 'px'
+                        store.commit('updateComponent', { key: 'top', value: newValue, id: data.id })
+                        break;
+                    }
+                    case 'Down': {
+                        const newValue = oldTop + amount + 'px'
+                        store.commit('updateComponent', { key: 'top', value: newValue, id: data.id })
+                        break
+                    }
+                    case 'Left': {
+                        const newValue = oldLeft - amount + 'px'
+                        store.commit('updateComponent', { key: 'left', value: newValue, id: data.id })
+                        break
+                    }
+                    case 'Right': {
+                        const newValue = oldLeft + amount + 'px'
+                        store.commit('updateComponent', { key: 'left', value: newValue, id: data.id })
+                        break
+                    }
+                    default:
+                        break;
+                }
+            }
+        },
         updateComponent(state, { key, value ,id, isRoot}) {
             const updatedComponent = state.components.find((component) => component.id === (id || state.currentElement));
             if (updatedComponent) {
@@ -127,6 +161,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     getters: {
         getCurrentElement: (state) => {
             return state.components.find((component) => component.id === state.currentElement);
+        },
+        getElement: (state) => (id: string) => {
+            return state.components.find(component => component.id === (id || state.currentElement))
         }
     }
 };
