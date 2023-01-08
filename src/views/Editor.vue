@@ -58,6 +58,7 @@
 import { defineComponent, computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
+import initHotKeys from '@/plugins/hotKeys'
 import { GlobalDataProps } from '../store/index'
 import ComponentsList from '../components/ComponentsList.vue'
 import EditWrapper from '@/components/EditWrapper.vue'
@@ -78,6 +79,7 @@ export default defineComponent({
     EditGroup
   },
   setup() {
+    initHotKeys()
     const store = useStore<GlobalDataProps>()
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
