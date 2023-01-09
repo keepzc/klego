@@ -46,10 +46,13 @@
 <script lang="ts">
 import { defineComponent, reactive, ref, Ref, computed, watch } from 'vue'
 import { Form, message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { useStore } from 'vuex'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
 import { Rule } from 'ant-design-vue/es/form/interface'
+import { GlobalDataProps } from '../store/index'
+
 interface RuleFormInstance {
     validate: () => Promise<any>;
 }
@@ -61,6 +64,8 @@ export default defineComponent({
     },
     setup() {
         const counter = ref(60)
+        const store = useStore<GlobalDataProps>()
+        const router = useRouter()
         let timer = 0
         const loginForm = ref() as Ref<RuleFormInstance>
         const form = reactive({
@@ -107,7 +112,16 @@ export default defineComponent({
         const { validate, resetFields } = useForm(form, rules)
         const login = () => {
             validate().then(() => {
-                alert('passed')
+                const payload = {
+                    phoneNumber: form.phoneNumber,
+                    veriCode: form.veriCode
+                }
+                store.dispatch('loginAndFetch', payload).then(() => {
+                    message.success('登录成功 2秒后跳转首页')
+                    setTimeout(() => {
+                        router.push('/')
+                    }, 2000)
+                })
             })
         }
         const getCode = () => {

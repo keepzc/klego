@@ -1,38 +1,38 @@
 <template>
-      <a-button type="primary" v-if="!user.isLogin" @click="login">登录</a-button>
-      <div v-else>
-        <a-dropdown class="user-profile-component">
-          <router-link to="/setting">{{user.userName}}</router-link>
-          <template v-slot:overlay>
-            <a-menu class="user-profile-dropdown">
-              <a-menu-item key="0" @click="logout">登出</a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown>
-      </div>
+  <a-button type="primary" v-if="!user.isLogin" @click="login">登录</a-button>
+  <div v-else>
+    <a-dropdown class="user-profile-component">
+      <router-link to="/setting">{{ user.data?.nickName }}</router-link>
+      <template v-slot:overlay>
+        <a-menu class="user-profile-dropdown">
+          <a-menu-item key="0" @click="logout">登出</a-menu-item>
+        </a-menu>
+      </template>
+    </a-dropdown>
+  </div>
 </template>
 <script lang="ts">
-import {defineComponent,PropType} from 'vue'
-import {useRouter} from 'vue-router'
-import {useStore} from 'vuex'
-import user, {UserProps} from '../store/user'
-import {message} from 'ant-design-vue'
+import { defineComponent, PropType } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import user, { UserProps } from '../store/user'
+import { message } from 'ant-design-vue'
 export default defineComponent({
   name: 'user-profile',
-  props:{
-    user:{
-      type:Object as PropType<UserProps>,
+  props: {
+    user: {
+      type: Object as PropType<UserProps>,
       required: true
     }
   },
-  setup(){
+  setup() {
     const store = useStore()
     const router = useRouter()
-    const login = () =>{
+    const login = () => {
       store.commit('login')
       message.success('登录成功', 2)
     }
-    const logout =() =>{
+    const logout = () => {
       store.commit('logout')
       message.success('退出登录成功，2秒后跳转到首页', 2)
       setTimeout(() => {
@@ -47,10 +47,11 @@ export default defineComponent({
 })
 </script>
 <style>
-.user-profile-dropdown{
+.user-profile-dropdown {
   border-radius: 2px !important;
 }
-.user-operation > * {
+
+.user-operation>* {
   margin-left: 30px !important;
 }
 </style>
