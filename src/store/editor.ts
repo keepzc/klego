@@ -36,6 +36,8 @@ export interface EditorProps {
     histories: HistoryProps[];
     // 当前历史记录的操作位置
     historyIndex: number;
+    // 开始更新时的缓存值
+    cachedOldValues: any;
 }
 
 export interface PageProps {
@@ -107,6 +109,35 @@ const modifyHistory = (state: EditorProps, history: HistoryProps, type: 'undo' |
         }
     }
 }
+// 防抖
+const debounceChange = (callback: (...args: any) => void, timeout = 1000) => {
+    let timer = 0
+    return (...args: any) => {
+        console.log(timer);
+        clearTimeout(timer)
+        timer = window.setTimeout(() => {
+            callback(...args)
+        }, timeout)
+    }
+}
+
+// debounce 更新数据
+const pushModifyHistory = (state: EditorProps, { key ,value, id}: UpdateComponent, oldValue: any) => {    
+    state.histories.push({
+        id: uuidv4(),
+        componentId: (id || state.currentElement),
+        type:'modify',
+        data: {
+            oldValue: state.cachedOldValues,
+            newValue: value,
+            key
+        }
+    })
+    state.cachedOldValues = null
+}
+// debounce版本的函数
+const pushHistoryDebounce = debounceChange(pushModifyHistory)
+
 const editor: Module<EditorProps, GlobalDataProps> = {
     state: {
         components: testComponents,
@@ -116,7 +147,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
             title: 'test title'
         },
         histories: [],
-        historyIndex: -1
+        historyIndex: -1,
+        cachedOldValues: null
     },
     mutations: {
         resetEditor(state){
@@ -283,16 +315,12 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     (updatedComponent as any)[key as string] = value
                 }else {
                     const oldValue = Array.isArray(key)? key.map(key=> updatedComponent.props[key]) : updatedComponent.props[key]
-                    state.histories.push({
-                        id: uuidv4(),
-                        componentId: (id || state.currentElement),
-                        type:'modify',
-                        data: {
-                            oldValue,
-                            newValue: value,
-                            key
-                        }
-                    })
+                    // 保存开始旧的值
+                    if(!state.cachedOldValues){
+                        state.cachedOldValues = oldValue
+                    }
+                    // 使用debounce版本更新方法
+                    pushHistoryDebounce(state, {key, value, id}, oldValue)
                     if(Array.isArray(key) && Array.isArray(value)){
                         key.forEach((keyName,index)=>{
                             updatedComponent.props[keyName] = value[index]
