@@ -38,6 +38,8 @@ export interface EditorProps {
     historyIndex: number;
     // 开始更新时的缓存值
     cachedOldValues: any;
+    // 保存最多历史条目记录数
+    maxHistoryNumber: number;
 }
 
 export interface PageProps {
@@ -120,10 +122,28 @@ const debounceChange = (callback: (...args: any) => void, timeout = 1000) => {
         }, timeout)
     }
 }
-
+const pushHistory = (state: EditorProps, historyRecord: HistoryProps) => {
+    // check historyIndex is already moved
+    if(state.historyIndex !== -1){
+        // if moved, delete all the records greater than the index
+        state.histories = state.histories.slice(0, state.historyIndex)
+        // move historyIndex to unmoved
+        state.historyIndex = -1
+    }
+    // check length 
+    if(state.histories.length < state.maxHistoryNumber){
+        state.histories.push(historyRecord)
+    }else {
+        // larger than max number
+        // shift the first
+        // push to last
+        state.histories.shift()
+        state.histories.push(historyRecord)
+    }
+}
 // debounce 更新数据
 const pushModifyHistory = (state: EditorProps, { key ,value, id}: UpdateComponent, oldValue: any) => {    
-    state.histories.push({
+    pushHistory(state, {
         id: uuidv4(),
         componentId: (id || state.currentElement),
         type:'modify',
@@ -148,7 +168,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         },
         histories: [],
         historyIndex: -1,
-        cachedOldValues: null
+        cachedOldValues: null,
+        maxHistoryNumber: 5
     },
     mutations: {
         resetEditor(state){
@@ -160,7 +181,14 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         addComponent(state, component: ComponentData) {
             component.layerName = '图层' + (state.components.length + 1)
             state.components.push(component);
-            state.histories.push({
+            // state.histories.push({
+            //     id:uuidv4(),
+            //     componentId: component.id,
+            //     type: 'add',
+            //     data: cloneDeep(component)
+            // })
+            // 使用historyPush方法替换, 保证指定个数历史记录 默认只能添加5条
+            pushHistory(state, {
                 id:uuidv4(),
                 componentId: component.id,
                 type: 'add',
@@ -252,7 +280,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 clone.layerName = clone.layerName + '副本'
                 state.components.push(clone)
                 message.success('已粘贴当前图层', 1)
-                state.histories.push({
+                pushHistory(state, {
                     id:uuidv4(),
                     componentId: clone.id,
                     type: 'add',
@@ -265,7 +293,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
             if(currentComponent){
                 const currentIndex = state.components.findIndex(component => component.id === id)
                 state.components = state.components.filter(component => component.id !== id)
-                state.histories.push({
+                pushHistory(state, {
                     id: uuidv4(),
                     componentId: currentComponent.id,
                     type: 'delete',
