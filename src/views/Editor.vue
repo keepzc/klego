@@ -60,6 +60,7 @@ import { defineComponent, computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
+import initContextMenu from '@/plugins/contextMenu'
 import { GlobalDataProps } from '../store/index'
 import { ComponentData } from '../store/editor'
 import ComponentsList from '../components/ComponentsList.vue'
@@ -69,7 +70,6 @@ import PropsTable from '@/components/PropsTable.vue'
 import LayerList from '../components/LayerList.vue'
 import EditGroup from '../components/EditGroup.vue'
 import HistoryArea from './editor/HistoryArea.vue'
-import createContextMenu from '@/components/createContextMenu'
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
   name: 'editor',
@@ -83,14 +83,8 @@ export default defineComponent({
   },
   setup() {
     initHotKeys()
-    const testActions = [{
-      shortcut: ' ctrl + z', text: '撤销', action: () => {
-        console.log('撤销');
-      }
-    }]
-    onMounted(() => {
-      createContextMenu(testActions)
-    })
+    // 初始化右键操作菜单
+    initContextMenu()
     const store = useStore<GlobalDataProps>()
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
@@ -132,8 +126,7 @@ export default defineComponent({
       pageChange,
       activePanel,
       page,
-      updatePosition,
-      testActions
+      updatePosition
     }
   }
 })

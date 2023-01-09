@@ -1,6 +1,6 @@
 <template>
-  <div class="edit-wrapper" ref="editWrapper" :style="styles" @mousedown="startMove" @click="onItemClick(id)"
-    :class="{ active: active, hidden: hidden }">
+  <div class="edit-wrapper" ref="editWrapper" :data-component-id="id" :style="styles" @mousedown="startMove"
+    @click="onItemClick(id)" :class="{ active: active, hidden: hidden }">
     <slot></slot>
     <div class="resizers">
       <div class='resizer top-left' @mousedown.stop="startResize('top-left')"></div>
