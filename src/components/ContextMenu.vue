@@ -11,7 +11,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted, onUnmounted } from 'vue'
-import { string } from '_vue-types@3.0.2@vue-types'
 import { getParentElement } from '../helper'
 import { ActionItem } from './createContextMenu'
 

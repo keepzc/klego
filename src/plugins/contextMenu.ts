@@ -1,4 +1,4 @@
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import createContextMenu, { ActionItem} from '@/components/createContextMenu'
 
@@ -15,9 +15,13 @@ const initContextMenu = () => {
     //         action: () => { console.log('撤销')}
     //     }
     // ]
+    let destory: any
     onMounted(() => {
-        createContextMenu(testActions)
-        // createContextMenu(testActions2, 'settings-panel')
+        destory = createContextMenu(testActions)
+        //destory2 = createContextMenu(testActions2, 'settings-panel')
+    })
+    onUnmounted(() => {
+        destory()
     })
 }
 
