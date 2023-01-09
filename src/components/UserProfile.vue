@@ -1,11 +1,16 @@
 <template>
-  <a-button type="primary" v-if="!user.isLogin" @click="login">登录</a-button>
+  <router-link to="/login" v-if="!user.isLogin">
+    <a-button type="primary" class="user-profile-component">
+      登录
+    </a-button>
+  </router-link>
   <div v-else>
     <a-dropdown class="user-profile-component">
       <router-link to="/setting">{{ user.data?.nickName }}</router-link>
       <template v-slot:overlay>
         <a-menu class="user-profile-dropdown">
-          <a-menu-item key="0" @click="logout">登出</a-menu-item>
+          <a-menu-item key="0">创建作品</a-menu-item>
+          <a-menu-item key="1" @click="logout">登出</a-menu-item>
         </a-menu>
       </template>
     </a-dropdown>

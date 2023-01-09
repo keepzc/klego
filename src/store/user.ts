@@ -1,6 +1,6 @@
-import { Module } from "vuex";
-import axios from 'axios'
-import { GlobalDataProps } from "./index";
+import { Module, ActionContext} from "vuex";
+import axios, { AxiosRequestConfig } from 'axios'
+import { GlobalDataProps, actionWrapper } from "./index";
 import { RespData } from './respTypes'
 
 export interface UserDataProps {
@@ -43,16 +43,13 @@ const user: Module<UserProps, GlobalDataProps> = {
         }
     },
     actions:{
-        login({ commit }, payload){
-            return axios.post('/users/loginByPhoneNumber', payload).then(resp => {
-                commit('login', resp.data)
-            })
-        },
-        fetchCurrentUser({ commit }) {
-            return axios.get('/users/getUserInfo').then(rawData => {
-                commit('fetchCurrentUser', rawData.data)
-            })
-        },
+        login: actionWrapper('/users/loginByPhoneNumber','login', { method: 'post'}),
+        // login({ commit }, payload){
+        //     return axios.post('/users/loginByPhoneNumber', payload).then(resp => {
+        //         commit('login', resp.data)
+        //     })
+        // },
+        fetchCurrentUser: actionWrapper('/users/getUserInfo', 'fetchCurrentUser'),
         loginAndFetch({dispatch}, loginData){
             return dispatch('login', loginData).then(()=>{
                 return dispatch('fetchCurrentUser')
