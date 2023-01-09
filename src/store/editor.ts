@@ -16,6 +16,13 @@ export interface HistoryProps{
     index?: number;
 }
 
+export interface UpdateComponent {
+    key: keyof AllComponentProps | Array<keyof AllComponentProps>;
+    value: string | string[];
+    id: string;
+    isRoot?: boolean;
+}
+
 export interface EditorProps {
     //编辑器渲染数组
     components: ComponentData[];
@@ -61,7 +68,7 @@ export interface ComponentData {
 }
 
 export const testComponents: ComponentData[] = [
-    { id: uuidv4(), name: 'l-text', layerName:'图层1', props: { ...textDefaultProps, text: 'hello', fontSize: '20px', color: '#000000', 'lineHeight': '1', textAlign: 'left', fontFamily: '', width: '100px', height: '100px', backgroundColor: '#efefef', left: '10px', top: '10px' }},
+    { id: uuidv4(), name: 'l-text', layerName:'图层1', props: { ...textDefaultProps, text: 'hello', fontSize: '20px', color: '#000000', 'lineHeight': '1', textAlign: 'left', fontFamily: '', width: '100px', height: '100px', backgroundColor: '#efefef', left: '100px', top: '100px' }},
     // {
     //     id: uuidv4(),
     //     name: "l-text",
@@ -84,6 +91,22 @@ export const testComponents: ComponentData[] = [
     // }
 ];
 const pageDefaultProps = { backgroundColor: '#ffffff', backgroundImage: '', backgroundRepeat: 'no-repeat', backgroundSize: 'cover', height: '560px' }
+const modifyHistory = (state: EditorProps, history: HistoryProps, type: 'undo' | 'redo') => {
+    const {componentId,data} = history
+    const { key, oldValue, newValue } =data
+    const newKey = key as keyof AllComponentProps | Array<keyof AllComponentProps>
+    const updateComponent = state.components.find(component => component.id === componentId)
+    if(updateComponent) {
+        // check if key is array
+        if(Array.isArray(newKey)){
+            newKey.forEach((keyName,index)=> {
+                updateComponent.props[keyName] = type === 'undo'? oldValue[index] : newValue[index]
+            })
+        }else {
+            updateComponent.props[newKey] = type === 'undo' ? oldValue : newValue
+        }
+    }
+}
 const editor: Module<EditorProps, GlobalDataProps> = {
     state: {
         components: testComponents,
@@ -138,12 +161,13 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     break;
                 case 'modify':{
                     // get the modified component by id, restore to the old value
-                    const { componentId, data } = history
-                    const { key, oldValue } = data
-                    const updateComponent = state.components.find(component => component.id === componentId)
-                    if(updateComponent){
-                        updateComponent.props[key as keyof AllComponentProps] = oldValue
-                    }
+                    // const { componentId, data } = history
+                    // const { key, oldValue } = data
+                    // const updateComponent = state.components.find(component => component.id === componentId)
+                    // if(updateComponent){
+                    //     updateComponent.props[key as keyof AllComponentProps] = oldValue
+                    // }
+                    modifyHistory(state, history, 'undo')
                     break;
                 }
                     
@@ -168,12 +192,13 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     state.components = state.components.filter(component => component.id !== history.componentId)
                     break;
                 case 'modify':{
-                    const { componentId, data } = history
-                    const { key, newValue } = data
-                    const updateComponent = state.components.find(component => component.id === componentId)
-                    if(updateComponent){
-                        updateComponent.props[key as keyof AllComponentProps] = newValue
-                    }
+                    // const { componentId, data } = history
+                    // const { key, newValue } = data
+                    // const updateComponent = state.components.find(component => component.id === componentId)
+                    // if(updateComponent){
+                    //     updateComponent.props[key as keyof AllComponentProps] = newValue
+                    // }
+                    modifyHistory(state, history, 'redo')
                     break;
                 }
                 default:
@@ -250,15 +275,14 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 }
             }
         },
-        updateComponent(state, { key, value ,id, isRoot}) {
+        updateComponent(state, { key, value ,id, isRoot}: UpdateComponent) {
             const updatedComponent = state.components.find((component) => component.id === (id || state.currentElement));
             if (updatedComponent) {
                 if(isRoot) {
                     // https://github.com/microsoft/TypeScript/issues/31663
-                    (updatedComponent as any)[key] = value
+                    (updatedComponent as any)[key as string] = value
                 }else {
-                    const oldValue = updatedComponent.props[key as keyof AllComponentProps]
-                    updatedComponent.props[key as keyof AllComponentProps] = value;
+                    const oldValue = Array.isArray(key)? key.map(key=> updatedComponent.props[key]) : updatedComponent.props[key]
                     state.histories.push({
                         id: uuidv4(),
                         componentId: (id || state.currentElement),
@@ -269,8 +293,14 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                             key
                         }
                     })
+                    if(Array.isArray(key) && Array.isArray(value)){
+                        key.forEach((keyName,index)=>{
+                            updatedComponent.props[keyName] = value[index]
+                        })
+                    }else if(typeof key === 'string' && typeof value === 'string'){
+                        updatedComponent.props[key] = value;
+                    }
                 }
-                
             }
         },
         updatePage(state, {key,value}) {

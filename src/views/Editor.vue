@@ -107,9 +107,13 @@ export default defineComponent({
     const updatePosition = (data: { width: number; height: number; left: number; top: number; id: string }) => {
       const { id } = data
       const updatedData = pickBy<number>(data, (v, k) => k !== 'id')
-      forEach(updatedData, (v, key) => {
-        store.commit('updateComponent', { key, value: v + 'px', id })
-      })
+      // forEach(updatedData, (v, key) => {
+      //   store.commit('updateComponent', { key, value: v + 'px', id })
+      // })
+      // 为了解决多次调用 updateComponent的问题
+      const keysArr = Object.keys(updatedData)
+      const valuesArr = Object.values(updatedData).map(item => item + 'px')
+      store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
     }
     return {
       components,
