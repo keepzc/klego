@@ -1,11 +1,18 @@
+<template>
+    <div class="context-menu-component menu-container" ref="menuRef">
+        <ul class="ant-menu-light ant-menu-root ant-menu ant-menu-vertical">
+            <li v-for="(action, index) in actions" :key="index" @click="action.action" class="ant-menu-item">
+                <span class="item-text">{{ action.text }}</span>
+                <span class="item-shortcut">{{ action.shortcut }}</span>
+            </li>
+        </ul>
+    </div>
+</template>
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted, onUnmounted } from 'vue'
 import { getParentElement } from '../helper'
-interface ActionItem {
-    action: () => void;
-    text: string;
-    shortcut: string;
-}
+import { ActionItem } from './createContextMenu'
+
 export default defineComponent({
     props: {
         actions: {
@@ -43,18 +50,6 @@ export default defineComponent({
     }
 })
 </script>
-
-<template>
-    <div class="context-menu-component menu-container" ref="menuRef">
-        <ul class="ant-menu-light ant-menu-root ant-menu ant-menu-vertical">
-            <li v-for="(action, index) in actions" :key="index" @click="action.action" class="ant-menu-item">
-                <span class="item-text">{{ action.text }}</span>
-                <span class="item-shortcut">{{ action.shortcut }}</span>
-            </li>
-        </ul>
-    </div>
-</template>
-
 <style  scoped>
 .menu-container {
     display: none;

@@ -1,6 +1,5 @@
 <template>
   <div class="editer-container">
-    <context-menu :actions="testActions" />
     <a-layout>
       <a-layout-sider width="300" :style="{ background: '#fff' }">
         <div class="sider-container">
@@ -57,7 +56,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { defineComponent, computed, ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
@@ -70,8 +69,7 @@ import PropsTable from '@/components/PropsTable.vue'
 import LayerList from '../components/LayerList.vue'
 import EditGroup from '../components/EditGroup.vue'
 import HistoryArea from './editor/HistoryArea.vue'
-import ContextMenu from '../components/ContextMenu.vue'
-
+import createContextMenu from '@/components/createContextMenu'
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
   name: 'editor',
@@ -81,8 +79,7 @@ export default defineComponent({
     PropsTable,
     LayerList,
     EditGroup,
-    HistoryArea,
-    ContextMenu
+    HistoryArea
   },
   setup() {
     initHotKeys()
@@ -91,6 +88,9 @@ export default defineComponent({
         console.log('撤销');
       }
     }]
+    onMounted(() => {
+      createContextMenu(testActions)
+    })
     const store = useStore<GlobalDataProps>()
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
