@@ -155,4 +155,27 @@ export default defineComponent({
   margin-top: 50px;
   max-height: 80vh;
 }
+
+.aside h2 {
+  color: #CCCCCC;
+  font-size: 29px;
+}
+
+.aside-inner {
+  width: 60%;
+  text-align: center;
+}
+
+.login-area {
+  height: 100vh;
+}
+
+.aside-inner {
+  width: 60%;
+  text-align: center;
+}
+
+.login-area {
+  height: 100vh;
+}
 </style>
