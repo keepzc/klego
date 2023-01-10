@@ -67,6 +67,12 @@ export default defineComponent({
         const store = useStore<GlobalDataProps>()
         const isLoading = computed(() => store.getters.isLoading)
         const isLoginLoading = computed(() => store.getters.isOpLoading('login'))
+        const error = computed(() => store.state.global.error)
+        watch(() => error.value.status, (errorValue) => {
+            if (errorValue) {
+                message.error(error.value.message || '未知错误', 2)
+            }
+        })
         const router = useRouter()
         let timer = 0
         const loginForm = ref() as Ref<RuleFormInstance>
