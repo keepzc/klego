@@ -29,7 +29,7 @@
                         </a-input>
                     </a-form-item>
                     <a-form-item>
-                        <a-button type="primary" size="large" @click="login">
+                        <a-button type="primary" size="large" :loading="isLoginLoading" @click="login">
                             登录
                         </a-button>
                         <a-button size="large" :style="{ marginLeft: '20px' }" @click="getCode"
@@ -65,6 +65,8 @@ export default defineComponent({
     setup() {
         const counter = ref(60)
         const store = useStore<GlobalDataProps>()
+        const isLoading = computed(() => store.getters.isLoading)
+        const isLoginLoading = computed(() => store.getters.isOpLoading('login'))
         const router = useRouter()
         let timer = 0
         const loginForm = ref() as Ref<RuleFormInstance>
@@ -137,7 +139,9 @@ export default defineComponent({
             rules,
             login,
             codeButtonDisable,
-            getCode
+            getCode,
+            isLoading,
+            isLoginLoading
         }
     }
 })

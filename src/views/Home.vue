@@ -16,12 +16,14 @@ export default defineComponent({
   },
   setup() {
     const store = useStore<GlobalDataProps>()
+    const isLoading = computed(() => store.getters.isOpLoading('fetchTemplates'))
     const testData = computed(() => store.state.templates.data)
     onMounted(() => {
       store.dispatch('fetchTemplates')
     })
     return {
-      testData
+      testData,
+      isLoading
     }
   }
 })
