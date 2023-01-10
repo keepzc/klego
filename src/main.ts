@@ -33,8 +33,9 @@ axios.interceptors.response.use((resp: AxiosResponse<RespData>) => {
     }
     return resp
 }, (e: AxiosError) => {
+    const newConfig = e.config as ICustomAxiosConfig
     store.commit('setError', { status: true, message: '服务器错误' })
-    store.commit('finishLoading')
+    store.commit('finishLoading', { opName: newConfig.opName })
     return Promise.reject(e)
 })
 

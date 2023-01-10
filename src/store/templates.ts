@@ -1,6 +1,5 @@
-import { Module } from "vuex";
-import axios from 'axios'
-import { GlobalDataProps } from "./index";
+import { Module } from "vuex"
+import { GlobalDataProps } from "./index"
 import { RespListData } from './respTypes'
 import { actionWrapper } from './index'
 
