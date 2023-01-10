@@ -26,12 +26,14 @@ export interface UserProps {
 const user: Module<UserProps, GlobalDataProps> = {
     state: {
         isLogin: false,
-        data: {}
+        data: {},
+        token: localStorage.getItem('token') || ''
     },
     mutations: {
         login(state, rawData: RespData<{token: string}>) {
             const { token } = rawData.data
             state.token = token
+            localStorage.setItem('token', token)
             axios.defaults.headers.common.Authorization = `Bearer ${token}`
         },
         fetchCurrentUser(state, rawData: RespData<UserDataProps>){
