@@ -16,7 +16,7 @@
             <a-button type="primary" @click="saveWork" :loading="saveIsLoading">保存</a-button>
           </a-menu-item>
           <a-menu-item key="3">
-            <a-button type="primary">发布</a-button>
+            <a-button type="primary" @click="publish">发布</a-button>
           </a-menu-item>
           <a-menu-item key="4">
             <user-profile :user="userInfo"></user-profile>
@@ -30,13 +30,14 @@
       <a-layout-sider width="300" :style="{ background: '#fff' }">
         <div class="sider-container">
           <components-list :list="defaultTextTemplates" @on-item-click="addItem" />
+          <img id="test-image" :style="{ width: '300px' }" />
         </div>
       </a-layout-sider>
       <a-layout style="padding:0 24px 24px">
         <a-layout-content class="preview-container">
           <p>画布区域</p>
           <history-area />
-          <div class="preview-list" id="canvas-area">
+          <div class="preview-list" id="canvas-area" :class="{ 'canvas-fix': canvasFix }">
             <div class="body-container" :style="(page.props)">
               <edit-wrapper v-for="component in components" :id="component.id" :key="component.id"
                 @set-active="setActive" @update-position="updatePosition" :active="component.id === currentElement?.id"
@@ -82,10 +83,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted, watch } from 'vue'
+import { defineComponent, computed, ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { pickBy } from 'lodash-es'
+import { flatMap, pickBy } from 'lodash-es'
+import html2canvas from 'html2canvas'
 import initHotKeys from '@/plugins/hotKeys'
 import initContextMenu from '@/plugins/contextMenu'
 import { GlobalDataProps } from '../store/index'
@@ -123,6 +125,7 @@ export default defineComponent({
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
+    const canvasFix = ref(false)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
     const { saveWork, saveIsLoading } = useSaveWork()
@@ -160,6 +163,18 @@ export default defineComponent({
       const valuesArr = Object.values(updatedData).map(item => item + 'px')
       store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
     }
+    const publish = async () => {
+      // remove select element
+      store.commit('setActive', '')
+      const el = document.getElementById('canvas-area') as HTMLElement
+      canvasFix.value = true
+      await nextTick()
+      html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
+        const image = document.getElementById('test-image') as HTMLImageElement
+        image.src = canvas.toDataURL()
+        canvasFix.value = false
+      })
+    }
     return {
       components,
       defaultTextTemplates,
@@ -174,7 +189,9 @@ export default defineComponent({
       titleChange,
       userInfo,
       saveWork,
-      saveIsLoading
+      saveIsLoading,
+      publish,
+      canvasFix
     }
   }
 })
@@ -235,5 +252,16 @@ export default defineComponent({
   font-weight: 500;
   margin-left: 10px;
   font-size: 16px;
+}
+
+// html2canvas 不识别box-shadow属性
+.preview-list.canvas-fix .edit-wrapper>* {
+  box-shadow: none !important;
+}
+
+// html2canvas截图由于max-height设置导致截图不全
+.preview-list.canvas-fix {
+  position: absolute;
+  max-height: none;
 }
 </style>

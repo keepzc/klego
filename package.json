@@ -15,6 +15,7 @@
     "core-js": "^3.6.5",
     "cropperjs": "^1.5.11",
     "hotkeys-js": "^3.10.1",
+    "html2canvas": "^1.4.1",
     "kpzc-lego-components": "^1.0.4",
     "lodash-es": "^4.17.21",
     "path-to-regexp": "^6.2.1",
