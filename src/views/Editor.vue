@@ -30,7 +30,6 @@
       <a-layout-sider width="300" :style="{ background: '#fff' }">
         <div class="sider-container">
           <components-list :list="defaultTextTemplates" @on-item-click="addItem" />
-          <img id="test-image" :style="{ width: '300px' }" />
         </div>
       </a-layout-sider>
       <a-layout style="padding:0 24px 24px">
