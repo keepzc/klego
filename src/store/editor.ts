@@ -1,4 +1,4 @@
-import { Module } from "vuex";
+import { Module ,Mutation} from "vuex";
 import {message} from 'ant-design-vue'
 import {cloneDeep} from 'lodash-es'
 import { v4 as uuidv4 } from "uuid";
@@ -41,6 +41,8 @@ export interface EditorProps {
     cachedOldValues: any;
     // 保存最多历史条目记录数
     maxHistoryNumber: number;
+    // 数据是否有修改
+    isDirty: boolean;
 }
 
 export interface PageProps {
@@ -161,7 +163,12 @@ const pushModifyHistory = (state: EditorProps, { key ,value, id}: UpdateComponen
 }
 // debounce版本的函数
 const pushHistoryDebounce = debounceChange(pushModifyHistory)
-
+const setDirtyWrapper = (callback: Mutation<EditorProps>) => {
+    return (state: EditorProps, payload: any) =>{
+        state.isDirty = true
+        callback(state, payload)
+    }
+}
 const editor: Module<EditorProps, GlobalDataProps> = {
     state: {
         components: testComponents,
@@ -173,7 +180,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         histories: [],
         historyIndex: -1,
         cachedOldValues: null,
-        maxHistoryNumber: 5
+        maxHistoryNumber: 5,
+        isDirty: false
     },
     mutations: {
         resetEditor(state){
@@ -182,7 +190,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
             state.historyIndex = -1
             state.histories = []
         },
-        addComponent(state, component: ComponentData) {
+        addComponent: setDirtyWrapper((state, component: ComponentData) => {
             component.layerName = '图层' + (state.components.length + 1)
             state.components.push(component);
             // state.histories.push({
@@ -198,7 +206,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 type: 'add',
                 data: cloneDeep(component)
             })
-        },
+        }),
         setActive(state, currentId: string) {
             state.currentElement = currentId;
         },
@@ -277,7 +285,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 message.success('已拷贝当前图层', 1)
             }
         },
-        pastCopiedComponent(state){
+        pastCopiedComponent: setDirtyWrapper((state) =>{
             if(state.copiedComponent){
                 const clone = cloneDeep(state.copiedComponent)
                 clone.id = uuidv4()
@@ -291,8 +299,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     data: cloneDeep(clone)
                 })
             }
-        },
-        deleteComponent(state, id: string) {
+        }),
+        deleteComponent: setDirtyWrapper((state, id: string) => {
             const currentComponent = state.components.find(component=> component.id === id)
             if(currentComponent){
                 const currentIndex = state.components.findIndex(component => component.id === id)
@@ -306,7 +314,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 })
                 message.success('删除当前图层成功', 1)
             }
-        },
+        }),
         moveComponent(state, data: {direction: MoveDirection; amount: number; id: string}){
             const currentComponent = state.components.find(component=> component.id === data.id)
             if(currentComponent){
@@ -339,7 +347,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 }
             }
         },
-        updateComponent(state, { key, value ,id, isRoot}: UpdateComponent) {
+        updateComponent: setDirtyWrapper((state, { key, value ,id, isRoot}: UpdateComponent) => {
             const updatedComponent = state.components.find((component) => component.id === (id || state.currentElement));
             if (updatedComponent) {
                 if(isRoot) {
@@ -362,8 +370,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     }
                 }
             }
-        },
-        updatePage(state, {key,value, isRoot}) {
+        }),
+        updatePage: setDirtyWrapper((state, {key,value, isRoot}) => {
             if(isRoot){
                 state.page[key as keyof PageData] = value
             }else{
@@ -371,7 +379,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                     state.page.props[key as keyof PageProps] = value
                 }
             }
-        },
+        }),
         fetchWork(state, {data}: RespWorkData){
             const { content, ...rest } = data
             state.page = { ...state.page, ...rest }
@@ -379,6 +387,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
                 state.page.props = content.props
             }
             state.components = content.components
+        },
+        saveWork(state){
+            state.isDirty = false
         }
     },
     actions:{

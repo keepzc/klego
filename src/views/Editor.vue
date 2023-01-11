@@ -13,7 +13,7 @@
             <a-button type="primary">预览和设置</a-button>
           </a-menu-item>
           <a-menu-item key="2">
-            <a-button type="primary" @click="saveWork">保存</a-button>
+            <a-button type="primary" @click="saveWork" :loading="saveIsLoading">保存</a-button>
           </a-menu-item>
           <a-menu-item key="3">
             <a-button type="primary">发布</a-button>
@@ -37,7 +37,7 @@
           <p>画布区域</p>
           <history-area />
           <div class="preview-list" id="canvas-area">
-            <div class="body-container" :style="page.props">
+            <div class="body-container" :style="(page.props)">
               <edit-wrapper v-for="component in components" :id="component.id" :key="component.id"
                 @set-active="setActive" @update-position="updatePosition" :active="component.id === currentElement?.id"
                 :props="component.props" :hidden="component.isHidden">
@@ -82,7 +82,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted, watch } from 'vue'
+import { defineComponent, computed, ref, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
@@ -122,6 +122,8 @@ export default defineComponent({
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
+    const saveIsLoading = computed(() => store.getters.isOpLoading('saveWork'))
+    const isDirty = computed(() => store.state.editor.isDirty)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
     onMounted(() => {
@@ -173,6 +175,17 @@ export default defineComponent({
       }
       store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId } })
     }
+    let timer = 0
+    onMounted(() => {
+      timer = setInterval(() => {
+        if (isDirty.value) {
+          saveWork()
+        }
+      }, 5000)
+    })
+    onUnmounted(() => {
+      clearInterval(timer)
+    })
     return {
       components,
       defaultTextTemplates,
@@ -186,7 +199,8 @@ export default defineComponent({
       updatePosition,
       titleChange,
       userInfo,
-      saveWork
+      saveWork,
+      saveIsLoading
     }
   }
 })
