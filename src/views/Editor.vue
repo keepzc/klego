@@ -82,11 +82,10 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted, watch, onUnmounted } from 'vue'
-import { useRoute, onBeforeRouteLeave } from 'vue-router'
-import { Modal } from 'ant-design-vue'
+import { defineComponent, computed, ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { pickBy, forEach } from 'lodash-es'
+import { pickBy } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
 import initContextMenu from '@/plugins/contextMenu'
 import { GlobalDataProps } from '../store/index'
@@ -100,6 +99,7 @@ import EditGroup from '../components/EditGroup.vue'
 import HistoryArea from './editor/HistoryArea.vue'
 import InlineEdit from '../components/InlineEdit.vue'
 import UserProfile from '../components/UserProfile.vue'
+import useSaveWork from '../hooks/useSaveWork'
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
   name: 'editor',
@@ -123,10 +123,9 @@ export default defineComponent({
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
-    const saveIsLoading = computed(() => store.getters.isOpLoading('saveWork'))
-    const isDirty = computed(() => store.state.editor.isDirty)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
+    const { saveWork, saveIsLoading } = useSaveWork()
     onMounted(() => {
       if (currentWorkId) {
         store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
@@ -161,51 +160,6 @@ export default defineComponent({
       const valuesArr = Object.values(updatedData).map(item => item + 'px')
       store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
     }
-    // watch(() => page.value.title, (newvalue) => {
-    //   console.log(newvalue);
-
-    // })
-    const saveWork = () => {
-      const { title, props } = page.value
-      const payload = {
-        title,
-        content: {
-          components: components.value,
-          props
-        }
-      }
-      store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId } })
-    }
-    let timer = 0
-    onMounted(() => {
-      timer = setInterval(() => {
-        if (isDirty.value) {
-          saveWork()
-        }
-      }, 5000)
-    })
-    onUnmounted(() => {
-      clearInterval(timer)
-    })
-    onBeforeRouteLeave((to, from, next) => {
-      if (isDirty.value) {
-        Modal.confirm({
-          title: '作品还未保存，是否保存？',
-          okText: '保存',
-          okType: 'primary',
-          cancelText: '不保存',
-          onOk: async () => {
-            await saveWork()
-            next()
-          },
-          onCancel: () => {
-            next()
-          }
-        })
-      } else {
-        next()
-      }
-    })
     return {
       components,
       defaultTextTemplates,
