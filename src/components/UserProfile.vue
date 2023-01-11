@@ -5,15 +5,15 @@
     </a-button>
   </router-link>
   <div v-else>
-    <a-dropdown class="user-profile-component">
+    <a-dropdown-button class="user-profile-component">
       <router-link to="/setting">{{ user.data?.nickName }}</router-link>
-      <template v-slot:overlay>
+      <template #overlay>
         <a-menu class="user-profile-dropdown">
           <a-menu-item key="0">创建作品</a-menu-item>
           <a-menu-item key="1" @click="logout">登出</a-menu-item>
         </a-menu>
       </template>
-    </a-dropdown>
+    </a-dropdown-button>
   </div>
 </template>
 <script lang="ts">

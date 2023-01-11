@@ -20,9 +20,10 @@ export default defineComponent({
     emits: ['change'],
     setup(props, context) {
         const innerValue = ref(props.value)
-        // watch(() => props.value, (newValue) => {
-        //     innerValue.value = newValue
-        // })
+        // watch value发生改变重新赋值
+        watch(() => props.value, (newValue) => {
+            innerValue.value = newValue
+        })
         const wrapper = ref<null | HTMLElement>(null)
         const inputRef = ref<null | HTMLInputElement>(null)
         const isEditing = ref(false)
