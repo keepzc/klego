@@ -6,6 +6,7 @@ import store, { GlobalDataProps, actionWrapper } from "./index";
 import {insertAt} from '../helper'
 // import { TextComponentProps, ImageComponentProps } from "../defaultProps";
 import {AllComponentProps,textDefaultProps } from 'kpzc-lego-components'
+import { RespWorkData } from './respTypes'
 export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 
 export interface HistoryProps{
@@ -53,8 +54,11 @@ export interface PageProps {
 export type AllFormProps = PageProps & AllComponentProps
 
 export interface PageData {
-    props: PageProps;
-    title: string;
+    id?: string;
+    props?: PageProps;
+    title?: string;
+    desc?: string;
+    coverImg?: string;
 }
 export interface ComponentData {
     //这个元素属性
@@ -360,11 +364,22 @@ const editor: Module<EditorProps, GlobalDataProps> = {
             }
         },
         updatePage(state, {key,value}) {
-            state.page.props[key as keyof PageProps] = value
+            if(state.page.props){
+                state.page.props[key as keyof PageProps] = value
+            }
+        },
+        fetchWork(state, {data}: RespWorkData){
+            const {content, ...rest} = data
+            state.page = { ...state.page, ...rest}
+            if(content.props){
+                state.page.props = content.props
+            }
+            state.components = content.components
         }
     },
     actions:{
-        fetchWork: actionWrapper('/works/:id', 'fetchWork')
+        fetchWork: actionWrapper('/works/:id', 'fetchWork'),
+
     },
     getters: {
         getCurrentElement: (state) => {
