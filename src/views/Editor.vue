@@ -16,7 +16,7 @@
             <a-button type="primary" @click="saveWork" :loading="saveIsLoading">保存</a-button>
           </a-menu-item>
           <a-menu-item key="3">
-            <a-button type="primary" @click="publish">发布</a-button>
+            <a-button type="primary" @click="publish" :loading="isPublishing">发布</a-button>
           </a-menu-item>
           <a-menu-item key="4">
             <user-profile :user="userInfo"></user-profile>
@@ -126,6 +126,7 @@ export default defineComponent({
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
     const canvasFix = ref(false)
+    const isPublishing = ref(false)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
     const { saveWork, saveIsLoading } = useSaveWork()
@@ -165,14 +166,28 @@ export default defineComponent({
     }
     const publish = async () => {
       // remove select element
+      isPublishing.value = true
       store.commit('setActive', '')
       const el = document.getElementById('canvas-area') as HTMLElement
       canvasFix.value = true
       await nextTick()
-      const resp = await takeScreenshotAndUpload(el)
-      if (resp) {
-        console.log(resp.data.urls);
+      try {
+        // 1. 截图并且上传
+        const resp = await takeScreenshotAndUpload(el)
+        if (resp) {
+          console.log(resp.data.urls);
+          // 2. upload page coverImage in store
+          store.commit('updatePage', { key: 'coverImg', value: resp.data.urls[0], isRoot: true })
+          // 3. save work
+          await saveWork()
+          // 4. publish work
+          await store.dispatch('publishWork', { urlParams: { id: currentWorkId } })
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
         canvasFix.value = false
+        isPublishing.value = false
       }
       // html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
       //   const image = document.getElementById('test-image') as HTMLImageElement
@@ -196,7 +211,8 @@ export default defineComponent({
       saveWork,
       saveIsLoading,
       publish,
-      canvasFix
+      canvasFix,
+      isPublishing
     }
   }
 })
