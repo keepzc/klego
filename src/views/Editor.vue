@@ -6,14 +6,14 @@
           <router-link to="/">
             <img alt="慕课乐高" src="../assets/logo-simple.png" class="logo-img">
           </router-link>
-          <inline-edit :value="page.title" @change="titleChange" />
+          <inline-edit :value="(page.title as string)" @change="titleChange" />
         </div>
-        <a-menu :selectable="false" theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">
+        <a-menu :selectable="false" theme="dark" mode="horizontal" :style="{ lineHeight: '64px', width: '525px' }">
           <a-menu-item key="1">
             <a-button type="primary">预览和设置</a-button>
           </a-menu-item>
           <a-menu-item key="2">
-            <a-button type="primary">保存</a-button>
+            <a-button type="primary" @click="saveWork">保存</a-button>
           </a-menu-item>
           <a-menu-item key="3">
             <a-button type="primary">发布</a-button>
@@ -82,7 +82,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted } from 'vue'
+import { defineComponent, computed, ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
@@ -121,8 +121,6 @@ export default defineComponent({
     const store = useStore<GlobalDataProps>()
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
-    console.log(page);
-
     const userInfo = computed(() => store.state.user)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
@@ -160,7 +158,21 @@ export default defineComponent({
       const valuesArr = Object.values(updatedData).map(item => item + 'px')
       store.commit('updateComponent', { key: keysArr, value: valuesArr, id })
     }
+    // watch(() => page.value.title, (newvalue) => {
+    //   console.log(newvalue);
 
+    // })
+    const saveWork = () => {
+      const { title, props } = page.value
+      const payload = {
+        title,
+        content: {
+          components: components.value,
+          props
+        }
+      }
+      store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId } })
+    }
     return {
       components,
       defaultTextTemplates,
@@ -173,12 +185,13 @@ export default defineComponent({
       page,
       updatePosition,
       titleChange,
-      userInfo
+      userInfo,
+      saveWork
     }
   }
 })
 </script>
-<style>
+<style lang="scss" scoped>
 .editer-container .preview-container {
   padding: 24px;
   margin: 0;
@@ -187,6 +200,10 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   position: relative;
+
+  .ant-menu-dark.ant-menu-horizontal>.ant-menu-item:hover {
+    background-color: none !important;
+  }
 }
 
 .editer-container .preview-list {
@@ -226,9 +243,9 @@ export default defineComponent({
   display: flex;
 }
 
-/* .page-title .inline-edit span {
+.page-title .inline-edit span {
   font-weight: 500;
   margin-left: 10px;
   font-size: 16px;
-} */
+}
 </style>
