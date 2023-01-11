@@ -17,6 +17,7 @@
     "hotkeys-js": "^3.10.1",
     "kpzc-lego-components": "^1.0.4",
     "lodash-es": "^4.17.21",
+    "path-to-regexp": "^6.2.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.14",
     "vuedraggable": "next",

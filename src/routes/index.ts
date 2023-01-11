@@ -21,7 +21,7 @@ const router = createRouter({
             ]
         },
         {
-            path: "/editor",
+            path: '/editor/:id',
             name: "editor",
             component: Editor,
             meta: { requiredLogin: true, title: '编辑我的设计' }
@@ -37,9 +37,7 @@ const router = createRouter({
 
 router.beforeEach(async(to, from) => {
     const {user} = store.state
-    const {token, isLogin} = user
-    console.log(isLogin);
-    
+    const {token, isLogin} = user   
     const {redirectAlreadyLogin, requiredLogin, title} = to.meta
     if(title){
         document.title = title as string

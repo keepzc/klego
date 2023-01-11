@@ -2,7 +2,7 @@ import { Module } from "vuex";
 import {message} from 'ant-design-vue'
 import {cloneDeep} from 'lodash-es'
 import { v4 as uuidv4 } from "uuid";
-import store, { GlobalDataProps } from "./index";
+import store, { GlobalDataProps, actionWrapper } from "./index";
 import {insertAt} from '../helper'
 // import { TextComponentProps, ImageComponentProps } from "../defaultProps";
 import {AllComponentProps,textDefaultProps } from 'kpzc-lego-components'
@@ -362,6 +362,9 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         updatePage(state, {key,value}) {
             state.page.props[key as keyof PageProps] = value
         }
+    },
+    actions:{
+        fetchWork: actionWrapper('/works/:id', 'fetchWork')
     },
     getters: {
         getCurrentElement: (state) => {

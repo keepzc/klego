@@ -57,6 +57,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, computed, ref, onMounted } from 'vue'
+import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
@@ -85,11 +86,18 @@ export default defineComponent({
     initHotKeys()
     // 初始化右键操作菜单
     initContextMenu()
+    const route = useRoute()
+    const currentWorkId = route.params.id
     const store = useStore<GlobalDataProps>()
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
+    onMounted(() => {
+      if (currentWorkId) {
+        store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
+      }
+    })
     const addItem = (props: any) => {
       console.log(props, '555')
       store.commit('addComponent', props)
