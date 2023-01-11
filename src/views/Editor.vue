@@ -101,7 +101,7 @@ import HistoryArea from './editor/HistoryArea.vue'
 import InlineEdit from '../components/InlineEdit.vue'
 import UserProfile from '../components/UserProfile.vue'
 import useSaveWork from '../hooks/useSaveWork'
-import { takeScreenshotAndUpload } from '../helper'
+import usePublishWork from '../hooks/usePublishWork'
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
   name: 'editor',
@@ -125,12 +125,11 @@ export default defineComponent({
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
-    const channels = computed(() => store.state.editor.channels)
     const canvasFix = ref(false)
-    const isPublishing = ref(false)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
     const { saveWork, saveIsLoading } = useSaveWork()
+    const { publishWork, isPublishing } = usePublishWork()
     onMounted(() => {
       if (currentWorkId) {
         store.dispatch('fetchWork', { urlParams: { id: currentWorkId } })
@@ -167,34 +166,16 @@ export default defineComponent({
     }
     const publish = async () => {
       // remove select element
-      isPublishing.value = true
       store.commit('setActive', '')
       const el = document.getElementById('canvas-area') as HTMLElement
       canvasFix.value = true
       await nextTick()
       try {
-        // 1. 截图并且上传
-        const resp = await takeScreenshotAndUpload(el)
-        if (resp) {
-          console.log(resp.data.urls);
-          // 2. upload page coverImage in store
-          store.commit('updatePage', { key: 'coverImg', value: resp.data.urls[0], isRoot: true })
-          // 3. save work
-          await saveWork()
-          // 4. publish work
-          await store.dispatch('publishWork', { urlParams: { id: currentWorkId } })
-          if (channels.value.length === 0) {
-            await store.dispatch('createChannel', { data: { name: '默认', workId: parseInt(currentWorkId as string) } })
-          }
-          // 5. get channels list
-          await store.commit('fetchChannels', { urlParams: { id: currentWorkId } })
-          // 6. if channels list length is 0, create a new channel
-        }
+        await publishWork(el)
       } catch (error) {
         console.error(error);
       } finally {
         canvasFix.value = false
-        isPublishing.value = false
       }
       // html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
       //   const image = document.getElementById('test-image') as HTMLImageElement

@@ -5,7 +5,7 @@ import { Modal } from 'ant-design-vue'
 import { GlobalDataProps } from '../store/index'
 
 // 在 Editor 中完成保存作品的一系列相关功能
-function useSaveWork() {
+function useSaveWork(disabledSideEffects = false) {
     // 数据准备
     const route = useRoute()
     const currentWorkId = route.params.id
@@ -27,38 +27,40 @@ function useSaveWork() {
         }
         store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId } })
     }
-    // 自动保存
-    let timer = 0
-    onMounted(() => {
-      timer = setInterval(() => {
-        if (isDirty.value) {
-          saveWork()
-        }
-      }, 1000 * 8)
-    })
-    onUnmounted(() => {
-      clearInterval(timer)
-    })
-    // 离开路由前提示
-    onBeforeRouteLeave((to, from, next) => {
-        if (isDirty.value) {
-          Modal.confirm({
-            title: '作品还未保存，是否保存？',
-            okText: '保存',
-            okType: 'primary',
-            cancelText: '不保存',
-            onOk: async () => {
-              await saveWork()
-              next()
-            },
-            onCancel: () => {
-              next()
-            }
-          })
-        } else {
-          next()
-        }
-    })
+    if(!disabledSideEffects){
+      // 自动保存
+      let timer = 0
+      onMounted(() => {
+        timer = setInterval(() => {
+          if (isDirty.value) {
+            saveWork()
+          }
+        }, 1000 * 8)
+      })
+      onUnmounted(() => {
+        clearInterval(timer)
+      })
+      // 离开路由前提示
+      onBeforeRouteLeave((to, from, next) => {
+          if (isDirty.value) {
+            Modal.confirm({
+              title: '作品还未保存，是否保存？',
+              okText: '保存',
+              okType: 'primary',
+              cancelText: '不保存',
+              onOk: async () => {
+                await saveWork()
+                next()
+              },
+              onCancel: () => {
+                next()
+              }
+            })
+          } else {
+            next()
+          }
+      })
+    }
     return {
         saveWork,
         saveIsLoading
