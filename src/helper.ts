@@ -1,4 +1,7 @@
-import { message } from "ant-design-vue";
+import { RespUploadData } from './store/respTypes'
+import { message } from 'ant-design-vue'
+import html2canvas from 'html2canvas'
+import axios from 'axios'
 interface CheckCondition {
     format?: string[];
     // 使用多少 M 为单位
@@ -61,4 +64,35 @@ export const getParentElement = (element: HTMLElement, className: string) =>{
 
 export const insertAt = (arr: any[], index: number, newItem: any) => {
     return [ ...arr.slice(0, index), newItem, ...arr.slice(index) ]
+}
+
+export async function uploadFile<R = any>(file: Blob, url = "/utils/upload-img", fileName = 'screenshot.png' ) {
+    const newFile = file instanceof File ? file : new File([file], fileName)
+    const formData = new FormData()
+    formData.append(newFile.name, newFile)
+    const {data} = await axios.post<R>(url, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return data
+}
+export function getCanvasBlob(canvas: HTMLCanvasElement) {
+    return new Promise<Blob | null>((resolve) =>{
+        canvas.toBlob(blob => {
+            resolve(blob)
+        })
+    })
+}
+
+export async function takeScreenshotAndUpload(ele: HTMLElement) {
+    // get screenshot canvas
+    const canvas = await html2canvas(ele, { width: 375, useCORS: true, scale: 1 })
+    // transform canvas to blob
+    const canvasBlob = await getCanvasBlob(canvas)
+    if(canvasBlob){
+        // upload blob to server
+        const data = await uploadFile<RespUploadData>(canvasBlob)
+        return data
+    }
 }

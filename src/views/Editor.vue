@@ -86,8 +86,7 @@
 import { defineComponent, computed, ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { flatMap, pickBy } from 'lodash-es'
-import html2canvas from 'html2canvas'
+import { pickBy } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
 import initContextMenu from '@/plugins/contextMenu'
 import { GlobalDataProps } from '../store/index'
@@ -102,6 +101,7 @@ import HistoryArea from './editor/HistoryArea.vue'
 import InlineEdit from '../components/InlineEdit.vue'
 import UserProfile from '../components/UserProfile.vue'
 import useSaveWork from '../hooks/useSaveWork'
+import { takeScreenshotAndUpload } from '../helper'
 export type TabType = 'component' | 'layer' | 'page'
 export default defineComponent({
   name: 'editor',
@@ -169,11 +169,16 @@ export default defineComponent({
       const el = document.getElementById('canvas-area') as HTMLElement
       canvasFix.value = true
       await nextTick()
-      html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
-        const image = document.getElementById('test-image') as HTMLImageElement
-        image.src = canvas.toDataURL()
+      const resp = await takeScreenshotAndUpload(el)
+      if (resp) {
+        console.log(resp.data.urls);
         canvasFix.value = false
-      })
+      }
+      // html2canvas(el, { width: 375, useCORS: true, scale: 1 }).then(canvas => {
+      //   const image = document.getElementById('test-image') as HTMLImageElement
+      //   image.src = canvas.toDataURL()
+      //   canvasFix.value = false
+      // })
     }
     return {
       components,
