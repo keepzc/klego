@@ -83,7 +83,8 @@
 </template>
 <script lang="ts">
 import { defineComponent, computed, ref, onMounted, watch, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteLeave } from 'vue-router'
+import { Modal } from 'ant-design-vue'
 import { useStore } from 'vuex'
 import { pickBy, forEach } from 'lodash-es'
 import initHotKeys from '@/plugins/hotKeys'
@@ -185,6 +186,25 @@ export default defineComponent({
     })
     onUnmounted(() => {
       clearInterval(timer)
+    })
+    onBeforeRouteLeave((to, from, next) => {
+      if (isDirty.value) {
+        Modal.confirm({
+          title: '作品还未保存，是否保存？',
+          okText: '保存',
+          okType: 'primary',
+          cancelText: '不保存',
+          onOk: async () => {
+            await saveWork()
+            next()
+          },
+          onCancel: () => {
+            next()
+          }
+        })
+      } else {
+        next()
+      }
     })
     return {
       components,
