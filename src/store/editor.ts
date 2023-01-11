@@ -6,7 +6,7 @@ import store, { GlobalDataProps, actionWrapper } from "./index";
 import {insertAt} from '../helper'
 // import { TextComponentProps, ImageComponentProps } from "../defaultProps";
 import {AllComponentProps,textDefaultProps } from 'kpzc-lego-components'
-import { RespWorkData } from './respTypes'
+import { RespWorkData , ListData, RespData,RespListData} from './respTypes'
 export type MoveDirection = 'Up' | 'Down' | 'Left' | 'Right'
 
 export interface HistoryProps{
@@ -22,6 +22,13 @@ export interface UpdateComponent {
     value: string | string[];
     id: string;
     isRoot?: boolean;
+}
+
+export interface ChannelProps{
+    id: number;
+    name: string;
+    workId: number;
+    status: number;
 }
 
 export interface EditorProps {
@@ -43,6 +50,8 @@ export interface EditorProps {
     maxHistoryNumber: number;
     // 数据是否有修改
     isDirty: boolean;
+    // 当前 work 的 channels
+    channels: ChannelProps[];
 }
 
 export interface PageProps {
@@ -181,7 +190,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         historyIndex: -1,
         cachedOldValues: null,
         maxHistoryNumber: 5,
-        isDirty: false
+        isDirty: false,
+        channels: []
     },
     mutations: {
         resetEditor(state){
@@ -390,12 +400,21 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         },
         saveWork(state){
             state.isDirty = false
+        },
+        fetchChannels(state, { data }: RespListData<ChannelProps>) {
+            state.channels = data.list
+        },
+        createChannel(state, { data }: RespData<ChannelProps>){
+            state.channels.push(data)
         }
     },
     actions:{
         fetchWork: actionWrapper('/works/:id', 'fetchWork'),
         saveWork: actionWrapper('/works/:id','saveWork', { method: 'patch' }),
-        publishWork: actionWrapper('/works/publish/:id','publishWork', { method: 'post'})
+        publishWork: actionWrapper('/works/publish/:id','publishWork', { method: 'post'}),
+        fetchChannels: actionWrapper('/channel/getWorkChannels/:id', 'fetchChannels'),
+        createChannel: actionWrapper('/channel/','createChannel', { method: 'post'}),
+        deleteChannel: actionWrapper('/channel/:id', 'deleteChannel', { method: 'delete'})
     },
     getters: {
         getCurrentElement: (state) => {

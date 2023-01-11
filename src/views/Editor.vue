@@ -125,6 +125,7 @@ export default defineComponent({
     const components = computed(() => store.state.editor.components)
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
+    const channels = computed(() => store.state.editor.channels)
     const canvasFix = ref(false)
     const isPublishing = ref(false)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
@@ -182,6 +183,12 @@ export default defineComponent({
           await saveWork()
           // 4. publish work
           await store.dispatch('publishWork', { urlParams: { id: currentWorkId } })
+          if (channels.value.length === 0) {
+            await store.dispatch('createChannel', { data: { name: '默认', workId: parseInt(currentWorkId as string) } })
+          }
+          // 5. get channels list
+          await store.commit('fetchChannels', { urlParams: { id: currentWorkId } })
+          // 6. if channels list length is 0, create a new channel
         }
       } catch (error) {
         console.error(error);
