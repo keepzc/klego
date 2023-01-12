@@ -102,3 +102,27 @@ export function generateQRCode (id: string, url: string){
     const ele = document.getElementById(id) as HTMLCanvasElement
     return QRcode.toCanvas(ele, url, { width: 100})
 }
+
+export function copyToClipboard(text: string) {
+    // create a fake textarea, set value to text
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    // define styles to be hidden
+    textarea.style.position = 'fixed'
+    textarea.style.top = '0'
+    textarea.style.left = '-9999px'
+    // append to body and select
+    document.body.appendChild(textarea)
+    textarea.select()
+    // run execCommand in try/catch
+    try {
+      return document.execCommand('copy')
+    } catch (e) {
+      console.warn('copy failed', e)
+    } finally {
+      document.body.removeChild(textarea)
+    }
+}
+export function timeout(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}

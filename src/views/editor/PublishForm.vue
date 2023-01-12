@@ -62,7 +62,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, computed, onMounted, watch, ref } from 'vue'
+import { defineComponent, reactive, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { last } from 'lodash-es'
@@ -120,6 +120,9 @@ export default defineComponent({
                     console.log(e);
                 }
             })
+        })
+        onUnmounted(() => {
+            form.channelName = ''
         })
         watch(channels, async (newChannels, oldChannels) => {
             if (newChannels.length > oldChannels.length) {
