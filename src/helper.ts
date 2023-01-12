@@ -1,6 +1,7 @@
 import { RespUploadData } from './store/respTypes'
 import { message } from 'ant-design-vue'
 import html2canvas from 'html2canvas'
+import QRcode from 'qrcode'
 import axios from 'axios'
 interface CheckCondition {
     format?: string[];
@@ -95,4 +96,9 @@ export async function takeScreenshotAndUpload(ele: HTMLElement) {
         const data = await uploadFile<RespUploadData>(canvasBlob)
         return data
     }
+}
+
+export function generateQRCode (id: string, url: string){
+    const ele = document.getElementById(id) as HTMLCanvasElement
+    return QRcode.toCanvas(ele, url, { width: 100})
 }

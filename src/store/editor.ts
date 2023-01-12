@@ -406,7 +406,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
             state.channels = data.list
         },
         createChannel(state, { data }: RespData<ChannelProps>){
-            state.channels.push(data)
+            // state.channels.push(data)
+            state.channels = [...state.channels, data]
         },
         deleteChannel(state, {payload}: RespData<any>){
             if(payload && payload?.urlParams){

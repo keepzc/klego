@@ -64,9 +64,11 @@ import { defineComponent, reactive, computed, onMounted, watch, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import QRcode from 'qrcode'
+import { last } from 'lodash-es'
 import { message, Form } from 'ant-design-vue'
 import { GlobalDataProps } from '../../store/index'
 import { baseH5URL } from '../../main'
+import { generateQRCode } from '../../helper'
 
 export default defineComponent({
     setup() {
@@ -75,7 +77,6 @@ export default defineComponent({
         const currentWorkId = route.params.id as string
         const page = computed(() => store.state.editor.page)
         const channels = computed(() => store.state.editor.channels)
-        console.log(channels, 'channels');
 
         const form = reactive({
             channelName: ''
@@ -96,8 +97,8 @@ export default defineComponent({
                 await validate()
                 await store.dispatch('createChannel', { data: payload })
                 form.channelName = ''
-            } catch (error) {
-                console.error(error);
+            } catch (e) {
+                console.error(e);
             }
         }
         const deleteDisabled = computed(() => store.state.editor.channels.length === 1)
@@ -105,13 +106,26 @@ export default defineComponent({
             store.dispatch('deleteChannel', { urlParams: { id } })
         }
         onMounted(() => {
-            channels.value.forEach(channel => {
-                const ele = document.getElementById(`channel-barcode-${channel.id}`) as HTMLCanvasElement
-                QRcode.toCanvas(ele, generateChannelUrl(channel.id), { width: 100 }).then(() => {
-                    console.log('success');
-
-                })
+            channels.value.forEach(async channel => {
+                try {
+                    await generateQRCode(`channel-barcode-${channel.id}`, generateChannelUrl(channel.id))
+                } catch (e) {
+                    console.log(e);
+                }
             })
+        })
+        watch(channels, async (newChannels, oldChannels) => {
+            if (newChannels.length > oldChannels.length) {
+                // 获取channels最后一项 用lodash 的last方法
+                const createdChannels = last(newChannels)
+                if (createdChannels) {
+                    await generateQRCode(`channel-barcode-${createdChannels.id}`, generateChannelUrl(createdChannels.id))
+                }
+            }
+
+        }, {
+            // dom节点生成后运行watch
+            flush: 'post'
         })
         return {
             page,
