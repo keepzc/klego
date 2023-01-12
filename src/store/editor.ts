@@ -406,6 +406,12 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         },
         createChannel(state, { data }: RespData<ChannelProps>){
             state.channels.push(data)
+        },
+        deleteChannel(state, {payload}: RespData<any>){
+            if(payload && payload?.urlParams){
+                const { urlParams } = payload
+                state.channels = state.channels.filter(channel => channel.id !== urlParams.id)
+            }
         }
     },
     actions:{

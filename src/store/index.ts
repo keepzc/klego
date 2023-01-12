@@ -29,7 +29,7 @@ export function actionWrapper (url: string, commitName: string, config: AxiosReq
             newUrl = toPath(urlParams)     
         }
         const resp = await axios(newUrl, newConfig)
-        context.commit(commitName, resp.data)
+        context.commit(commitName, { payload, ...resp.data })
         return resp.data
     }
 }

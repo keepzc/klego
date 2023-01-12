@@ -27,8 +27,8 @@ function usePublishWork() {
               // 4. publish work
               await store.dispatch('publishWork', { urlParams: { id: currentWorkId } })
               // 5. get channels list
-              await store.commit('fetchChannels', { urlParams: { id: currentWorkId } })
-              // 6. if channels list length is 0, create a new channel
+              await store.dispatch('fetchChannels', { urlParams: { id: currentWorkId } })
+              // 6. if channels list length is 0, create a new channel            
               if (channels.value.length === 0) {
                 await store.dispatch('createChannel', { data: { name: '默认', workId: parseInt(currentWorkId as string) } })
               }

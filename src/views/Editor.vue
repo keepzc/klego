@@ -1,5 +1,8 @@
 <template>
   <div class="editer-container">
+    <a-modal title="发布成功" v-model:visible="showPublishForm" width="700px" :footer="null">
+      <publish-form />
+    </a-modal>
     <a-layout>
       <a-layout-header class="header">
         <div class="page-title">
@@ -99,6 +102,7 @@ import EditGroup from '../components/EditGroup.vue'
 import HistoryArea from './editor/HistoryArea.vue'
 import InlineEdit from '../components/InlineEdit.vue'
 import UserProfile from '../components/UserProfile.vue'
+import PublishForm from './editor/PublishForm.vue'
 import useSaveWork from '../hooks/useSaveWork'
 import usePublishWork from '../hooks/usePublishWork'
 export type TabType = 'component' | 'layer' | 'page'
@@ -112,7 +116,8 @@ export default defineComponent({
     EditGroup,
     HistoryArea,
     InlineEdit,
-    UserProfile
+    UserProfile,
+    PublishForm
   },
   setup() {
     initHotKeys()
@@ -125,6 +130,7 @@ export default defineComponent({
     const page = computed(() => store.state.editor.page)
     const userInfo = computed(() => store.state.user)
     const canvasFix = ref(false)
+    const showPublishForm = ref(false)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
     const activePanel = ref<TabType>('component')
     const { saveWork, saveIsLoading } = useSaveWork()
@@ -171,6 +177,7 @@ export default defineComponent({
       await nextTick()
       try {
         await publishWork(el)
+        showPublishForm.value = true
       } catch (error) {
         console.error(error);
       } finally {
@@ -199,7 +206,8 @@ export default defineComponent({
       saveIsLoading,
       publish,
       canvasFix,
-      isPublishing
+      isPublishing,
+      showPublishForm
     }
   }
 })
