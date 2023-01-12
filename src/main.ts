@@ -15,6 +15,7 @@ export type ICustomAxiosConfig = AxiosRequestConfig & {
 
 const app = createApp(App);
 const baseBackendUrl = 'http://47.93.58.48:7002'
+export const baseH5URL = 'http://47.93.58.48:7001'
 axios.defaults.baseURL = `${baseBackendUrl}/api/`
 axios.interceptors.request.use(config => {
     const newConfig = config as ICustomAxiosConfig

@@ -3,10 +3,10 @@ import { useStore } from 'vuex'
 import { useRoute, onBeforeRouteLeave } from 'vue-router'
 import { Modal } from 'ant-design-vue'
 import { GlobalDataProps } from '../store/index'
-
+export type TimerType = NodeJS.Timer | number
 // 在 Editor 中完成保存作品的一系列相关功能
 function useSaveWork(disabledSideEffects = false) {
-    // 数据准备
+    // 数据准备s
     const route = useRoute()
     const currentWorkId = route.params.id
     const store = useStore<GlobalDataProps>()
@@ -28,8 +28,9 @@ function useSaveWork(disabledSideEffects = false) {
         store.dispatch('saveWork', { data: payload, urlParams: { id: currentWorkId } })
     }
     if(!disabledSideEffects){
+     
       // 自动保存
-      let timer = 0
+      let timer: TimerType = 0
       onMounted(() => {
         timer = setInterval(() => {
           if (isDirty.value) {

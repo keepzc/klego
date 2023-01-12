@@ -20,13 +20,13 @@
                     <a-tab-pane key="channels" tab="发布为作品">
                         <a-row v-for="channel in channels" :key="channel.id" class="channel-item">
                             <a-col :span="6">
-                                <canvas class="barcode-container" />
+                                <canvas class="barcode-container" :id="`channel-barcode-${channel.id}`"></canvas>
                             </a-col>
                             <a-col :span="18" class="left-gap">
                                 <h4>{{ channel.name }}</h4>
                                 <a-row>
                                     <a-col :span="18">
-                                        <a-input :value="channel.id" />
+                                        <a-input :value="generateChannelUrl(channel.id)" />
                                     </a-col>
                                     <a-col :span="6">
                                         <a-button class="copy-button">复制</a-button>
@@ -63,8 +63,10 @@
 import { defineComponent, reactive, computed, onMounted, watch, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
+import QRcode from 'qrcode'
 import { message, Form } from 'ant-design-vue'
 import { GlobalDataProps } from '../../store/index'
+import { baseH5URL } from '../../main'
 
 export default defineComponent({
     setup() {
@@ -84,6 +86,7 @@ export default defineComponent({
             ]
         })
         const { validate } = Form.useForm(form, rules)
+        const generateChannelUrl = (id: number) => `${baseH5URL}/p/${page.value.id}-${page.value.uuid}?channel=${id}`
         const createChannel = async () => {
             const payload = {
                 name: form.channelName,
@@ -101,6 +104,15 @@ export default defineComponent({
         const deleteChannel = (id: number) => {
             store.dispatch('deleteChannel', { urlParams: { id } })
         }
+        onMounted(() => {
+            channels.value.forEach(channel => {
+                const ele = document.getElementById(`channel-barcode-${channel.id}`) as HTMLCanvasElement
+                QRcode.toCanvas(ele, generateChannelUrl(channel.id), { width: 100 }).then(() => {
+                    console.log('success');
+
+                })
+            })
+        })
         return {
             page,
             channels,
@@ -108,7 +120,8 @@ export default defineComponent({
             rules,
             deleteDisabled,
             createChannel,
-            deleteChannel
+            deleteChannel,
+            generateChannelUrl
         }
     }
 })

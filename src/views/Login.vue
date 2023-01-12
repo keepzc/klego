@@ -68,7 +68,7 @@ export default defineComponent({
         const isLoading = computed(() => store.getters.isLoading)
         const isLoginLoading = computed(() => store.getters.isOpLoading('login'))
         const router = useRouter()
-        let timer = 0
+        let timer: NodeJS.Timer | number = 0
         const loginForm = ref() as Ref<RuleFormInstance>
         const form = reactive({
             phoneNumber: '',

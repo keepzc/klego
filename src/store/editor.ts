@@ -70,6 +70,7 @@ export interface PageData {
     title?: string;
     desc?: string;
     coverImg?: string;
+    uuid?: string;
 }
 export interface ComponentData {
     //这个元素属性
