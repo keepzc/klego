@@ -1,9 +1,9 @@
 <template>
   <div class="editer-container">
     <a-modal title="发布成功" v-model:visible="showPublishForm" width="700px" :footer="null">
-      <publish-form />
+      <publish-form @close:visible="closePublishModel" />
     </a-modal>
-    <preview-form :visible="showPreviewForm" v-if="showPreviewForm" :update:visible="closeDrawer"></preview-form>
+    <preview-form :visible="showPreviewForm" v-if="showPreviewForm" @update:visible="closeDrawer"></preview-form>
     <a-layout>
       <a-layout-header class="header">
         <div class="page-title">
@@ -14,13 +14,13 @@
         </div>
         <a-menu :selectable="false" theme="dark" mode="horizontal" :style="{ lineHeight: '64px', width: '525px' }">
           <a-menu-item key="1">
-            <a-button type="primary" @click="preview">预览和设置</a-button>
+            <a-button type="primary" shape="round" @click="preview">预览和设置</a-button>
           </a-menu-item>
           <a-menu-item key="2">
-            <a-button type="primary" @click="saveWork" :loading="saveIsLoading">保存</a-button>
+            <a-button type="primary" shape="round" @click="saveWork" :loading="saveIsLoading">保存</a-button>
           </a-menu-item>
           <a-menu-item key="3">
-            <a-button type="primary" @click="publish" :loading="isPublishing">发布</a-button>
+            <a-button type="primary" shape="round" @click="publish" :loading="isPublishing">发布</a-button>
           </a-menu-item>
           <a-menu-item key="4">
             <user-profile :user="userInfo"></user-profile>
@@ -193,6 +193,9 @@ export default defineComponent({
       //   canvasFix.value = false
       // })
     }
+    const closePublishModel = () => {
+      showPublishForm.value = false
+    }
     const preview = async () => {
       await saveWork()
       showPreviewForm.value = true
@@ -222,7 +225,8 @@ export default defineComponent({
       showPublishForm,
       showPreviewForm,
       preview,
-      closeDrawer
+      closeDrawer,
+      closePublishModel
     }
   }
 })

@@ -32,11 +32,11 @@
                         <a-input v-model:value="form.desc" />
                     </a-form-item>
                     <a-form-item :wrapper-col="{ span: 18, offset: 4 }">
-                        <a-button type="primary" style="margin-left: 10px;" @click="validateAndSave"
+                        <a-button type="primary" shape="round" style="margin-left: 10px;" @click="validateAndSave"
                             :loading="saveIsLoading">
                             保存
                         </a-button>
-                        <a-button style="margin-left: 10px;" @click="onCancel">
+                        <a-button style="margin-left: 10px;" shape="round" @click="onCancel">
                             取消
                         </a-button>
                     </a-form-item>
@@ -73,6 +73,8 @@ export default defineComponent({
         const store = useStore<GlobalDataProps>()
         const pageState = computed(() => store.state.editor.page)
         const previewURL = computed(() => `${baseH5URL}/p/preview/${pageState.value.id}-${pageState.value.uuid}`)
+        console.log(previewURL);
+
         const { title, desc, setting } = pageState.value
         const { saveWork, saveIsLoading } = useSaveWork(true)
         const form = reactive({
@@ -136,7 +138,7 @@ export default defineComponent({
     }
 })
 </script>
-<style >
+<style scope>
 .final-preview {
     position: absolute;
     width: calc(100% - 400px);
@@ -189,5 +191,9 @@ export default defineComponent({
 #preview-barcode-container {
     border: 2px dotted #efefef;
     padding: 10px;
+}
+
+.ant-input {
+    border-radius: 20px;
 }
 </style>

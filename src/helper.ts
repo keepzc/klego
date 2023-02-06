@@ -99,7 +99,7 @@ export async function takeScreenshotAndUpload(ele: HTMLElement) {
 }
 
 export function generateQRCode (id: string, url: string){
-    const ele = document.getElementById(id) as HTMLCanvasElement
+    const ele = document.getElementById(id) as HTMLCanvasElement    
     return QRcode.toCanvas(ele, url, { width: 100})
 }
 

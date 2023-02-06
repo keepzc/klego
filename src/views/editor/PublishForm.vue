@@ -16,7 +16,7 @@
                         <p>{{ page.desc }}</p>
                     </a-col>
                 </a-row>
-                <a-tabs type="card" :style="{ marginTop: '20px' }">
+                <a-tabs type="card" :style="{ marginTop: '20px' }" v-model:activeKey="activeKey">
                     <a-tab-pane key="channels" tab="发布为作品">
                         <a-row v-for="channel in channels" :key="channel.id" class="channel-item">
                             <a-col :span="6">
@@ -30,13 +30,13 @@
                                             :id="`channel-url-${channel.id}`" />
                                     </a-col>
                                     <a-col :span="6">
-                                        <a-button class="copy-button"
+                                        <a-button class="copy-button" shape="round"
                                             :data-clipboard-target="`#channel-url-${channel.id}`">复制</a-button>
                                     </a-col>
                                 </a-row>
                             </a-col>
                             <div class="delete-area">
-                                <a-button type="danger" size="small" :disabled="deleteDisabled"
+                                <a-button type="danger" size="small" :disabled="deleteDisabled" shape="round"
                                     @click="deleteChannel(channel.id)">删除渠道</a-button>
                             </div>
                         </a-row>
@@ -45,7 +45,7 @@
                                 <a-input placeholder="渠道名称" v-model:value="form.channelName"></a-input>
                             </a-form-item>
                             <a-form-item>
-                                <a-button type="primary" @click="createChannel">
+                                <a-button type="primary" shape="round" @click="createChannel">
                                     创建新渠道
                                 </a-button>
                             </a-form-item>
@@ -53,7 +53,27 @@
 
                     </a-tab-pane>
                     <a-tab-pane key="template" tab="发布为模版">
-
+                        <a-row class="template-item">
+                            <a-col :span="6">
+                                <canvas class="barcode-container" id="template-barcode"></canvas>
+                            </a-col>
+                            <a-col :span="18">
+                                <h4>模版信息</h4>
+                                <a-row>
+                                    <a-col :span="18">
+                                        <a-input :value="generateTemplateUrl" :readonly="true" />
+                                    </a-col>
+                                    <a-col :span="6">
+                                        <a-button class="copy-button" shape="round"
+                                            :data-clipboard-target="222">复制</a-button>
+                                    </a-col>
+                                </a-row>
+                            </a-col>
+                        </a-row>
+                        <a-row class="template-btn">
+                            <a-button type="primary" shape="round" :loading="saveIsLoading"
+                                @click="publishTemplate">发布模板</a-button>
+                        </a-row>
                     </a-tab-pane>
                 </a-tabs>
             </a-col>
@@ -62,7 +82,7 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, computed, onMounted, watch, onUnmounted } from 'vue'
+import { defineComponent, reactive, computed, onMounted, watch, onUnmounted, nextTick, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { last } from 'lodash-es'
@@ -71,15 +91,19 @@ import { message, Form } from 'ant-design-vue'
 import { GlobalDataProps } from '../../store/index'
 import { baseH5URL } from '../../main'
 import { generateQRCode } from '../../helper'
+import { emit } from 'process'
+export type TabType = 'channels' | 'template'
 
 export default defineComponent({
-    setup() {
+    emits: ['close:visible'],
+    setup(props, { emit }) {
         const store = useStore<GlobalDataProps>()
         const route = useRoute()
         const currentWorkId = route.params.id as string
         const page = computed(() => store.state.editor.page)
         const channels = computed(() => store.state.editor.channels)
-
+        const saveIsLoading = computed(() => store.getters.isOpLoading('publishTemplate'))
+        const activeKey = ref<TabType>('template')
         const form = reactive({
             channelName: ''
         })
@@ -90,6 +114,7 @@ export default defineComponent({
         })
         const { validate } = Form.useForm(form, rules)
         const generateChannelUrl = (id: number) => `${baseH5URL}/p/${page.value.id}-${page.value.uuid}?channel=${id}`
+        const generateTemplateUrl = `${baseH5URL}/p/${page.value.id}-${page.value.uuid}`
         const createChannel = async () => {
             const payload = {
                 name: form.channelName,
@@ -107,22 +132,45 @@ export default defineComponent({
         const deleteChannel = (id: number) => {
             store.dispatch('deleteChannel', { urlParams: { id } })
         }
-        onMounted(() => {
+        const publishTemplate = async (id: number) => {
+            const res = await store.dispatch('publishTemplate', { urlParams: { id: currentWorkId } })
+            console.log(res);
+            if (res.errno === 0) {
+                message.success('发布模版成功')
+            }
+            emit('close:visible')
+        }
+        onMounted(async () => {
             const clipboard = new ClipboardJS('.copy-button')
             clipboard.on('success', (e) => {
                 message.success('复制成功', 1)
                 e.clearSelection()
             })
-            channels.value.forEach(async channel => {
-                try {
-                    await generateQRCode(`channel-barcode-${channel.id}`, generateChannelUrl(channel.id))
-                } catch (e) {
-                    console.log(e);
-                }
-            })
+            // 渲染模版二维码
+            await nextTick()
+            generateQRCode('template-barcode', generateTemplateUrl)
+            // channels.value.forEach(async channel => {
+            //     try {
+            //         await generateQRCode(`channel-barcode-${channel.id}`, generateChannelUrl(channel.id))
+            //     } catch (e) {
+            //         console.log(e);
+            //     }
+            // })
         })
         onUnmounted(() => {
             form.channelName = ''
+        })
+        watch(activeKey, async (newKey, oldKey) => {
+            await nextTick()
+            if (newKey === 'channels') {
+                channels.value.forEach(async channel => {
+                    try {
+                        await generateQRCode(`channel-barcode-${channel.id}`, generateChannelUrl(channel.id))
+                    } catch (e) {
+                        console.log(e);
+                    }
+                })
+            }
         })
         watch(channels, async (newChannels, oldChannels) => {
             if (newChannels.length > oldChannels.length) {
@@ -139,13 +187,17 @@ export default defineComponent({
         })
         return {
             page,
+            activeKey,
             channels,
             form,
             rules,
             deleteDisabled,
             createChannel,
             deleteChannel,
-            generateChannelUrl
+            generateChannelUrl,
+            publishTemplate,
+            generateTemplateUrl,
+            saveIsLoading
         }
     }
 })
@@ -173,6 +225,12 @@ export default defineComponent({
     position: relative;
 }
 
+.template-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #efefef;
+    position: relative;
+}
+
 .delete-area {
     position: absolute;
     top: 10px;
@@ -182,5 +240,18 @@ export default defineComponent({
 .barcode-container {
     height: 80px;
     width: 80px;
+}
+
+.ant-input {
+    border-radius: 20px;
+}
+
+.ant-tabs .ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab {
+    border-radius: 20px 20px 0 0 !important;
+}
+
+.template-btn {
+    margin-top: 20px;
+    justify-content: center;
 }
 </style>

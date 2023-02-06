@@ -1,6 +1,6 @@
 <template>
   <router-link to="/login" v-if="!user.isLogin">
-    <a-button type="primary" class="user-profile-component">
+    <a-button shape="round" type="primary" class="user-profile-component">
       登录
     </a-button>
   </router-link>
