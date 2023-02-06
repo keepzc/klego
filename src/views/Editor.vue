@@ -65,10 +65,6 @@
                 </a-empty>
               </div>
             </div>
-
-            <pre>
-              {{ currentElement && currentElement.props }}
-            </pre>
           </a-tab-pane>
           <a-tab-pane key="layer" tab="图层设置">
             <layer-list :selectedId="(currentElement?.id as string)" :list="components" @change="handleChange"

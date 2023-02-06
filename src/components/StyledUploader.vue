@@ -1,9 +1,9 @@
 <template>
-  <uploader class="styled-uploader" action="http://123.57.138.48/api/upload/" :showUploadList="false"
-    :beforeUpload="commonUploadCheck" @success="(data) => { handleUploadSuccess(data.resp, data.file.raw) }">
+  <uploader class="styled-uploader" action="/utils/upload-img" :showUploadList="false" :beforeUpload="commonUploadCheck"
+    @success="(data) => { handleUploadSuccess(data.resp, data.file.raw) }">
     <div class="uploader-container">
       <FileImageOutlined />
-      <h4>上传图片</h4>
+      <h4>{{ text }}</h4>
     </div>
     <template #loading>
       <div class="uploader-container">
@@ -11,10 +11,13 @@
         <h4>上传中</h4>
       </div>
     </template>
-    <template #uploaded>
+    <template #uploaded="dataProps">
       <div class="uploader-container">
-        <FileImageOutlined />
-        <h4>上传图片</h4>
+        <img :src="dataProps.uploadedData.data.urls[0]" v-if="showUploaded">
+        <template v-else>
+          <FileImageOutlined />
+          <h4>{{ text }}</h4>
+        </template>
       </div>
     </template>
   </uploader>
@@ -25,6 +28,16 @@ import { FileImageOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { commonUploadCheck } from '../helper'
 import Uploader from './Uploade.vue'
 export default defineComponent({
+  props: {
+    text: {
+      type: String,
+      default: '上传图片'
+    },
+    showUploaded: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
     Uploader,
     FileImageOutlined,
@@ -57,6 +70,10 @@ export default defineComponent({
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    img {
+      width: 100px;
+    }
   }
 
   .uploader-container:hover {
