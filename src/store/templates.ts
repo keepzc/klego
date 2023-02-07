@@ -2,16 +2,9 @@ import { Module } from "vuex"
 import { GlobalDataProps } from "./index"
 import { RespListData, RespData } from './respTypes'
 import { actionWrapper } from './index'
+import {PageData} from '../store/editor'
 
-export interface TemplateProps {
-    id: number;
-    title: string;
-    coverImg: string;
-    author: string;
-    copiedCount: number;
-    desc: string;
-    isHot: string;
-}
+export type TemplateProps =Required<Omit<PageData, 'props' | 'setting'>>
 
 export interface TemplatesProps {
     data: TemplateProps[];
@@ -29,7 +22,9 @@ const templates: Module<TemplatesProps, GlobalDataProps> = {
     },
     mutations: {
         fetchTemplates(state, rawData: RespListData<TemplateProps>) {
-            state.data = rawData.data.list
+            const { count, list } = rawData.data
+            state.data = [ ...state.data, ...list ]
+            state.totalTemplates = count
         },
         fetchWorks(state, rawData: RespListData<TemplateProps>) {
             const {count, list} = rawData.data
@@ -47,7 +42,7 @@ const templates: Module<TemplatesProps, GlobalDataProps> = {
     },
     getters: {
         getTemplateById: (state, getters, rootState) => (id: number) => {
-            return state.data.find((t) => t.id === id);
+            return state.data.find(t => t.id === id)
         }
     }
 };

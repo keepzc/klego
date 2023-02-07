@@ -126,3 +126,7 @@ export function copyToClipboard(text: string) {
 export function timeout(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
+
+export const objectToQueryString =(queryObject: {[key: string]: any})=>{
+    return Object.keys(queryObject).map(key=> `${key}=${queryObject[key]}`).join('&')
+}

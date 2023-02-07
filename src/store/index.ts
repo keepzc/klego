@@ -6,6 +6,8 @@ import templates, { TemplatesProps } from "./templates";
 import user, { UserProps } from "./user";
 import editor, { EditorProps } from "./editor";
 import global, { GlobalStatus } from './global'
+import {objectToQueryString} from '../helper'
+import {forEach} from 'lodash-es'
 export interface GlobalDataProps {
     user: UserProps;
     templates: TemplatesProps;
@@ -30,7 +32,12 @@ export function actionWrapper (url: string, commitName: string, config: AxiosReq
             newUrl = toPath(urlParams)     
         }
         if(searchParams) {
-            
+            const search = new URLSearchParams()
+            forEach(searchParams, (value,key)=>{
+                search.append(key,value)
+            })
+            // newUrl += '?' + objectToQueryString(searchParams)
+            newUrl += '?' + search.toString()
         }
         const resp = await axios(newUrl, newConfig)
         context.commit(commitName, { payload, ...resp.data })
