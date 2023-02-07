@@ -30,7 +30,6 @@
       </a-layout-header>
     </a-layout>
     <a-layout>
-
       <a-layout-sider width="300" :style="{ background: '#fff' }">
         <div class="sider-container">
           <components-list :list="defaultTextTemplates" @on-item-click="addItem" />
@@ -75,6 +74,7 @@
             <props-table :props="page.props" @change="pageChange">
             </props-table>
           </a-tab-pane>
+
         </a-tabs>
 
       </a-layout-sider>
@@ -283,6 +283,10 @@ export default defineComponent({
   font-weight: 500;
   margin-left: 10px;
   font-size: 16px;
+}
+
+.ant-menu-dark.ant-menu-horizontal>.ant-menu-item:hover {
+  background-color: none;
 }
 
 // html2canvas 不识别box-shadow属性

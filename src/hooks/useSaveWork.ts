@@ -15,7 +15,7 @@ function useSaveWork(disabledSideEffects = false) {
     const page = computed(() => store.state.editor.page)
     const isDirty = computed(() => store.state.editor.isDirty)
     // 保存函数
-    const saveWork = () => {
+    const saveWork = () => {      
         const { title, props, coverImg } = page.value
         const payload = {
           title,

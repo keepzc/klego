@@ -9,8 +9,9 @@
       <router-link to="/setting">{{ user.data?.nickName }}</router-link>
       <template #overlay>
         <a-menu class="user-profile-dropdown">
-          <a-menu-item key="0">创建作品</a-menu-item>
-          <a-menu-item key="1" @click="logout">登出</a-menu-item>
+          <a-menu-item key="0" @click="createDesign">创建作品</a-menu-item>
+          <a-menu-item key="1" @click="toMyWork">我的作品</a-menu-item>
+          <a-menu-item key="2" @click="logout">登出</a-menu-item>
         </a-menu>
       </template>
     </a-dropdown-button>
@@ -18,6 +19,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import user, { UserProps } from '../store/user'
@@ -33,6 +35,19 @@ export default defineComponent({
   setup() {
     const store = useStore()
     const router = useRouter()
+    const createDesign = async () => {
+      const payload = {
+        title: '未命名作品',
+        desc: '未命名作品',
+        coverImg: 'http://typescript-vue.oss-cn-beijing.aliyuncs.com/vue-marker/5f81cca3f3bf7a0e1ebaf885.png'
+      }
+      const postData = {
+        method: 'post', data: payload, opName: 'createDesign'
+      } as any
+      const { data } = await axios('/works', postData)
+      message.success('创建作品成功', 2)
+      router.push(`/editor/${data.data.id}`)
+    }
     const login = () => {
       store.commit('login')
       message.success('登录成功', 2)
@@ -44,9 +59,14 @@ export default defineComponent({
         router.push('/')
       }, 2000)
     }
+    const toMyWork = () => {
+      router.push('/mywork')
+    }
     return {
       login,
-      logout
+      logout,
+      createDesign,
+      toMyWork
     }
   }
 })

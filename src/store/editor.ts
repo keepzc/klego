@@ -397,7 +397,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }),
         updatePage: setDirtyWrapper((state, {key,value, isRoot,isSetting}) => {
             if(isRoot){
-                state.page[key as keyof PageData] = value
+                state.page[key as keyof PageData] = value              
             }else if(isSetting){
                 state.page.setting ={
                     ...state.page.setting,
@@ -410,12 +410,14 @@ const editor: Module<EditorProps, GlobalDataProps> = {
             }
         }),
         fetchWork(state, {data}: RespWorkData){
+            console.log(data,'---');
+            
             const { content, ...rest } = data
             state.page = { ...state.page, ...rest }
-            if (content.props) {
+            if (content?.props) {
                 state.page.props = content.props
             }
-            state.components = content.components
+            state.components = content?.components as ComponentData[]
         },
         saveWork(state){
             state.isDirty = false
@@ -437,6 +439,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
     actions:{
         fetchWork: actionWrapper('/works/:id', 'fetchWork'),
         saveWork: actionWrapper('/works/:id','saveWork', { method: 'patch' }),
+        createWork: actionWrapper('/works', 'createWork', { method: 'post' }),
         publishWork: actionWrapper('/works/publish/:id','publishWork', { method: 'post'}),
         publishTemplate: actionWrapper('/works/publish-template/:id', 'publishTemplate',  { method: 'post'}),
         fetchChannels: actionWrapper('/channel/getWorkChannels/:id', 'fetchChannels'),

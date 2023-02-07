@@ -13,7 +13,7 @@ export interface ListData<T> {
 }
 
 export interface WorkData extends Omit<PageData, 'props'> {
-    content: {
+    content?: {
         components: ComponentData[],
         props?:  PageProps
     }

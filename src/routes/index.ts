@@ -7,6 +7,7 @@ import Home from "../views/Home.vue";
 import Editor from "../views/Editor.vue";
 import TemplateDetail from "../views/TemplateDetail.vue";
 import Login from '../views/Login.vue'
+import Works from '../views/Works.vue'
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -17,7 +18,8 @@ const router = createRouter({
             component: Index,
             children: [
                 { path: "", name: "home", component: Home, meta: { title: '欢迎来到慕课乐高' }},
-                { path: "/template/:id", name: "template", component: TemplateDetail ,meta: { title: '模版详情' }}
+                { path: "/template/:id", name: "template", component: TemplateDetail ,meta: { title: '模版详情' }},
+                { path: '/mywork', name: 'works', component: Works, meta: { title: '我的作品', requiredLogin: true, } }
             ]
         },
         {

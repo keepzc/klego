@@ -1,6 +1,6 @@
 import { Module } from "vuex"
 import { GlobalDataProps } from "./index"
-import { RespListData } from './respTypes'
+import { RespListData, RespData } from './respTypes'
 import { actionWrapper } from './index'
 
 export interface TemplateProps {
@@ -15,19 +15,35 @@ export interface TemplateProps {
 
 export interface TemplatesProps {
     data: TemplateProps[];
+    totalTemplates: number;
+    works: TemplateProps[];
+    totalWorks: number;
 }
 
 const templates: Module<TemplatesProps, GlobalDataProps> = {
     state: {
-        data: []
+        data: [],
+        totalTemplates: 0,
+        works: [],
+        totalWorks: 0
     },
     mutations: {
         fetchTemplates(state, rawData: RespListData<TemplateProps>) {
             state.data = rawData.data.list
+        },
+        fetchWorks(state, rawData: RespListData<TemplateProps>) {
+            const {count, list} = rawData.data
+            state.works = list
+            state.totalWorks = count
+        },
+        fetchTemplate(state, rawData: RespData<TemplateProps>) {
+            state.data = [rawData.data]
         }
     },
     actions: {
-        fetchTemplates: actionWrapper('/templates', 'fetchTemplates')
+        fetchTemplates: actionWrapper('/templates', 'fetchTemplates'),
+        fetchWorks: actionWrapper('/works', 'fetchWorks'),
+        fetchTemplate: actionWrapper('/templates/:id', 'fetchTemplate')
     },
     getters: {
         getTemplateById: (state, getters, rootState) => (id: number) => {

@@ -19,7 +19,7 @@ function usePublishWork() {
             // 1. 截图并且上传
             const resp = await takeScreenshotAndUpload(el)
             if (resp) {
-              console.log(resp.data.urls);
+              console.log(resp.data.urls, '666');
               // 2. upload page coverImage in store
               store.commit('updatePage', { key: 'coverImg', value: resp.data.urls[0], isRoot: true })
               // 3. save work

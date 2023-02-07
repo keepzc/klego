@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ComponentData } from '../store/editor'
 import StyledUploader from '../components/StyledUploader.vue'
 import { imageDefaultProps, TextComponentProps } from 'kpzc-lego-components'
-import { UploadResp } from '../extraType'
+import { RespUploadData } from '../store/respTypes'
 import { getImageDimensions } from '../helper'
 export default defineComponent({
   props: {
@@ -38,7 +38,7 @@ export default defineComponent({
       context.emit('on-item-click', componentData)
     }
 
-    const onImageUploaded = (data: { resp: UploadResp; file: File }) => {
+    const onImageUploaded = (data: { resp: RespUploadData; file: File }) => {
       const { resp, file } = data
       console.log(file)
       const componentData: ComponentData = {
@@ -49,7 +49,7 @@ export default defineComponent({
         }
       }
       message.success('上传成功')
-      componentData.props.src = resp.data.url
+      componentData.props.src = resp.data.urls[0]
       getImageDimensions(file).then(({ width }) => {
         console.log(width)
         const maxWidth = 373
