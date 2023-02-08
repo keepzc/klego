@@ -19,12 +19,24 @@
         </a-empty>
         <works-list :list="works" @on-delete="onDelete" @on-copy="onCopy" :loading="isLoading">
         </works-list>
-        <a-row type="flex" justify="space-between" align="middle">
-            <h2>{{ pageIndex }}</h2>
-            <a-button type="primary" @click="loadPrePage" v-if="!isFirstPage" :loading="isLoading">上一页</a-button>
-            <a-button type="primary" @click="loadMorePage" v-if="!isLastPage" :loading="isLoading">下一页</a-button>
+        <a-row type="flex" justify="center" align="middle">
+            <ul class="ant-pagination">
+                <li class="ant-pagination-prev" :class="{ 'ant-pagination-disabled': isFirstPage }">
+                    <a class="ant-pagination-item-link" @click.prevent="loadPrePage">
+                        上一页
+                    </a>
+                </li>
+                <li v-for="item in totalPage" :key="item" class="ant-pagination-item"
+                    :class="{ 'ant-pagination-item-active': (pageIndex + 1) === item }">
+                    <a @click.prevent="goToPage(item - 1)">{{ item }}</a>
+                </li>
+                <li class="ant-pagination-next" :class="{ 'ant-pagination-disabled': isLastPage }">
+                    <a class="ant-pagination-item-link" @click.prevent="loadMorePage">
+                        下一页
+                    </a>
+                </li>
+            </ul>
         </a-row>
-
     </div>
 </template>
 
@@ -52,11 +64,11 @@ export default defineComponent({
         onMounted(() => {
             store.dispatch('fetchWorks', { searchParams: searchParams.value })
         })
-        const { isLastPage, loadMorePage, isFirstPage, loadPrePage, pageIndex } = useLoadMore('fetchWorks', total, searchParams.value)
-
+        const { isLastPage, loadMorePage, requestParams, isFirstPage, loadPrePage, pageIndex, goToPage, totalPage } = useLoadMore('fetchWorks', total, searchParams.value)
         const changeCategory = (key: any) => {
             isTemplate.value = key
             pageIndex.value = 0
+            requestParams.isTemplate = key
             nextTick(() => {
                 store.dispatch('fetchWorks', { searchParams: searchParams.value })
             })
@@ -80,7 +92,9 @@ export default defineComponent({
             loadMorePage,
             isFirstPage,
             loadPrePage,
-            pageIndex
+            pageIndex,
+            goToPage,
+            totalPage
         }
     }
 })
