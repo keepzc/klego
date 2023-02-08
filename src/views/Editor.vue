@@ -132,6 +132,8 @@ export default defineComponent({
     const showPublishForm = ref(false)
     const showPreviewForm = ref(false)
     const currentElement = computed<ComponentData | null>(() => store.getters.getCurrentElement)
+    console.log(currentElement);
+
     const activePanel = ref<TabType>('component')
     const { saveWork, saveIsLoading } = useSaveWork()
     const { publishWork, isPublishing } = usePublishWork()
@@ -283,6 +285,10 @@ export default defineComponent({
   font-weight: 500;
   margin-left: 10px;
   font-size: 16px;
+}
+
+.sider-container {
+  padding: 20px;
 }
 
 .ant-menu-dark.ant-menu-horizontal>.ant-menu-item:hover {

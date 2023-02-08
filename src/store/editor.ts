@@ -411,13 +411,12 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         }),
         fetchWork(state, {data}: RespWorkData){
             console.log(data,'---');
-            
             const { content, ...rest } = data
             state.page = { ...state.page, ...rest }
-            if (content?.props) {
+            if (content.props) {
                 state.page.props = content.props
             }
-            state.components = content?.components as ComponentData[]
+            state.components = content.components 
         },
         saveWork(state){
             state.isDirty = false
@@ -440,6 +439,7 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         fetchWork: actionWrapper('/works/:id', 'fetchWork'),
         saveWork: actionWrapper('/works/:id','saveWork', { method: 'patch' }),
         createWork: actionWrapper('/works', 'createWork', { method: 'post' }),
+        deleteWork: actionWrapper('/works/:id', 'deleteWork', { method: 'delete' }),
         publishWork: actionWrapper('/works/publish/:id','publishWork', { method: 'post'}),
         publishTemplate: actionWrapper('/works/publish-template/:id', 'publishTemplate',  { method: 'post'}),
         fetchChannels: actionWrapper('/channel/getWorkChannels/:id', 'fetchChannels'),
@@ -447,8 +447,8 @@ const editor: Module<EditorProps, GlobalDataProps> = {
         deleteChannel: actionWrapper('/channel/:id', 'deleteChannel', { method: 'delete'})
     },
     getters: {
-        getCurrentElement: (state) => {
-            return state.components.find((component) => component.id === state.currentElement);
+        getCurrentElement: (state) => {           
+            return state.components.find((component) => component.id === state.currentElement)
         },
         getElement: (state) => (id: string) => {
             return state.components.find(component => component.id === (id || state.currentElement))

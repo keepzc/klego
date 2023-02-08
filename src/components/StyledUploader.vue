@@ -60,6 +60,7 @@ export default defineComponent({
 <style lang="scss">
 .styled-uploader {
   .uploader-container {
+    margin: auto;
     width: 100px;
     padding: 10px;
     color: #ffffff;

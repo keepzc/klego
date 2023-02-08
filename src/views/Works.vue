@@ -32,21 +32,19 @@ export default defineComponent({
         const total = computed(() => store.state.templates.totalWorks)
         const isLoading = computed(() => store.getters.isOpLoading('fetchWorks'))
         const isTemplate = ref(0)
-        const searchParams = computed(() => ({ pageIndex: 0, pageSize: 4, isTemplate: isTemplate.value }))
+        const searchParams = computed(() => ({ pageIndex: 0, pageSize: 12, isTemplate: isTemplate.value }))
         onMounted(() => {
             store.dispatch('fetchWorks', { searchParams: searchParams.value })
         })
         const changeCategory = (key: any) => {
-            console.log(key, '---');
-
             isTemplate.value = key
-
             nextTick(() => {
                 store.dispatch('fetchWorks', { searchParams: searchParams.value })
             })
         }
-        const onDelete = (id: number) => {
-            store.dispatch('deleteWork', id)
+        const onDelete = async (id: number) => {
+            await store.dispatch('deleteWork', { urlParams: { id: id } })
+            await store.dispatch('fetchWorks', { searchParams: searchParams.value })
         }
         const onCopy = (id: number) => {
             store.dispatch('copyWork', id).then(({ data }) => {
