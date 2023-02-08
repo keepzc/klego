@@ -9,8 +9,22 @@
             <a-tab-pane key="1" tab="我的模版">
             </a-tab-pane>
         </a-tabs>
+        <a-empty v-if="works.length === 0 && !isLoading">
+            <template v-slot:description>
+                <span> 还没有任何作品 </span>
+            </template>
+            <a-button type="primary" size="large">
+                创建你的第一个设计 🎉
+            </a-button>
+        </a-empty>
         <works-list :list="works" @on-delete="onDelete" @on-copy="onCopy" :loading="isLoading">
         </works-list>
+        <a-row type="flex" justify="space-between" align="middle">
+            <h2>{{ pageIndex }}</h2>
+            <a-button type="primary" @click="loadPrePage" v-if="!isFirstPage" :loading="isLoading">上一页</a-button>
+            <a-button type="primary" @click="loadMorePage" v-if="!isLastPage" :loading="isLoading">下一页</a-button>
+        </a-row>
+
     </div>
 </template>
 
@@ -21,6 +35,8 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { GlobalDataProps } from '../store/index'
 import WorksList from '../components/WorksList.vue'
+import useLoadMore from '../hooks/useLoadMore'
+
 export default defineComponent({
     components: {
         WorksList
@@ -32,12 +48,15 @@ export default defineComponent({
         const total = computed(() => store.state.templates.totalWorks)
         const isLoading = computed(() => store.getters.isOpLoading('fetchWorks'))
         const isTemplate = ref(0)
-        const searchParams = computed(() => ({ pageIndex: 0, pageSize: 12, isTemplate: isTemplate.value }))
+        const searchParams = computed(() => ({ pageIndex: 0, pageSize: 4, isTemplate: isTemplate.value }))
         onMounted(() => {
             store.dispatch('fetchWorks', { searchParams: searchParams.value })
         })
+        const { isLastPage, loadMorePage, isFirstPage, loadPrePage, pageIndex } = useLoadMore('fetchWorks', total, searchParams.value)
+
         const changeCategory = (key: any) => {
             isTemplate.value = key
+            pageIndex.value = 0
             nextTick(() => {
                 store.dispatch('fetchWorks', { searchParams: searchParams.value })
             })
@@ -56,7 +75,12 @@ export default defineComponent({
             isLoading,
             onDelete,
             onCopy,
-            works
+            works,
+            isLastPage,
+            loadMorePage,
+            isFirstPage,
+            loadPrePage,
+            pageIndex
         }
     }
 })

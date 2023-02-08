@@ -12,15 +12,19 @@ const useLoadMore = (actionName: string, total: ComputedRef<number>, params: Loa
     const requestParams = computed(()=> {
         return {
             ...params,
-            pageIndex: pageIndex.value + 1
+            pageIndex: pageIndex.value
         }
     })
     const loadMorePage =() =>{
-        store.dispatch(actionName, {searchParams: requestParams.value}).then(()=>{
-            pageIndex.value++
-        })
+        pageIndex.value++
+        store.dispatch(actionName, {searchParams: requestParams.value})
+    }
+    const loadPrePage =() => {
+        pageIndex.value--
+        store.dispatch(actionName, {searchParams: requestParams.value})
     }
     const totalPage =computed(() => Math.ceil(total.value / params.pageSize))
+    const isFirstPage = computed(()=> pageIndex.value === 0)
     const isLastPage = computed(()=> {
         return Math.ceil(total.value / params.pageSize) === pageIndex.value+1
     })
@@ -28,7 +32,9 @@ const useLoadMore = (actionName: string, total: ComputedRef<number>, params: Loa
         loadMorePage,
         isLastPage,
         pageIndex,
-        totalPage
+        totalPage,
+        loadPrePage,
+        isFirstPage
     }
 }
 

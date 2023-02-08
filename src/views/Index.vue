@@ -23,7 +23,7 @@
       </a-layout-content>
     </a-layout>
     <a-layout-footer>
-      © keep版权所有
+      <div class="lego-footer">© keep版权所有</div>
     </a-layout-footer>
   </div>
 </template>
@@ -92,5 +92,9 @@ export default defineComponent({
 
 .page-title {
   color: #fff;
+}
+
+.lego-footer {
+  text-align: center;
 }
 </style>
