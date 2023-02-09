@@ -35,22 +35,21 @@ module.exports ={
                 })
             )
         }
+        // 根据缓存 浏览器平行加载资源 自动分割第三方库
         config.optimization.splitChunks = {
             maxInitialRequests: Infinity,
-            minSize: 0,
+            minSize: 300 * 1024,
             chunks: 'all',
             cacheGroups: {
                 antVendor: {
-                    name: 'ant-design-vue',
-                    test: /[\\/]node_modules[\\/](ant-design-vue)[\\/]/,
-                },
-                canvansVendor: {
-                    name: 'html2canvas',
-                    test: /[\\/]node_modules[\\/](html2canvas)[\\/]/,
-                },
-                vendor: {
-                    name: 'vendor',
-                    test: /[\\/]node_modules[\\/](!html2canvas)(!ant-design-vue)[\\/]/,
+                    test: /[\\/]node_modules[\\/]/,
+                    name(module) {
+                        // get the name. 
+                        // node_modules/packageName/sub/path
+                        // or node_modules/packageName
+                        const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+                        return `npm.${packageName.replace('@', '')}`
+                    }
                 }
             }
         }
