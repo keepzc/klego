@@ -21,6 +21,13 @@ module.exports ={
         }
     },
     configureWebpack: config => {
+        // 忽略 ant-design-vue组件 moment.js里面的国际化
+        config.plugins.push(
+            new webpack.IgnorePlugin({
+                resourceRegExp: /^\.\/locale$/,
+                contextRegExp: /moment$/,
+            })
+        )
         if(isAnalyzeMode){
             config.plugins.push(
                 new BundleAnalyzerPlugin({

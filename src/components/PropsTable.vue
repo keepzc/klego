@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { defineComponent, computed, PropType, VNode } from 'vue'
-import { reduce } from 'lodash'
+import { reduce } from 'lodash-es'
 import { mapPropsToForms } from '../propsMap'
 import { AllComponentProps } from 'kpzc-lego-components'
 import RenderVnode from './RenderVnode'
