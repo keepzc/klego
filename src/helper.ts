@@ -3,6 +3,8 @@ import { message } from 'ant-design-vue'
 import html2canvas from 'html2canvas'
 import QRcode from 'qrcode'
 import axios from 'axios'
+import { saveAs } from 'file-saver'
+
 interface CheckCondition {
     format?: string[];
     // 使用多少 M 为单位
@@ -158,4 +160,8 @@ export const downloadFile = (src: string, fileName = 'default.png') => {
         link.dispatchEvent(new MouseEvent('click'))
     }
     
+}
+export const downloadImage = (url: string) => {
+    const fileName = url.substring(url.lastIndexOf('/') + 1)
+    saveAs(url, fileName)
 }

@@ -37,7 +37,7 @@ import { useStore } from 'vuex'
 import { GlobalDataProps } from '../store/index'
 import { TemplateProps } from '../store/templates'
 import { baseH5URL } from '../main'
-import { generateQRCode, downloadFile } from '../helper'
+import { generateQRCode, downloadImage } from '../helper'
 
 export default defineComponent({
   setup() {
@@ -53,7 +53,7 @@ export default defineComponent({
     })
 
     const download = () => {
-      downloadFile(template.value.coverImg)
+      downloadImage(template.value.coverImg)
     }
     return {
       template,
