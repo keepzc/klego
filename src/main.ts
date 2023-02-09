@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios'
 import App from "./App.vue";
-import Antd from "ant-design-vue";
+import Antd from './configAntD'
 import KpzcLegoComponents from 'kpzc-lego-components'
 import "ant-design-vue/dist/antd.less";
 import 'kpzc-lego-components/dist/bundle.css'
