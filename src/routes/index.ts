@@ -4,9 +4,7 @@ import { message } from 'ant-design-vue'
 import store from '../store'
 import Index from "../views/Index.vue";
 import Home from "../views/Home.vue";
-import Editor from "../views/Editor.vue";
 import TemplateDetail from "../views/TemplateDetail.vue";
-import Login from '../views/Login.vue'
 import Works from '../views/Works.vue'
 
 const router = createRouter({
@@ -25,13 +23,13 @@ const router = createRouter({
         {
             path: '/editor/:id',
             name: "editor",
-            component: Editor,
+            component: () => import(/* webpackChunkName: "editor" */ '../views/Editor.vue'),
             meta: { requiredLogin: true, title: '编辑我的设计' }
         },
         {
             path: "/login",
             name: "login",
-            component: Login,
+            component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
             meta: {redirectAlreadyLogin: true, title: '登录到慕课乐高', disableLoading :true }
         }
     ]
