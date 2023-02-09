@@ -98,9 +98,9 @@ export async function takeScreenshotAndUpload(ele: HTMLElement) {
     }
 }
 
-export function generateQRCode (id: string, url: string){
+export function generateQRCode (id: string, url: string, width = 100){
     const ele = document.getElementById(id) as HTMLCanvasElement    
-    return QRcode.toCanvas(ele, url, { width: 100})
+    return QRcode.toCanvas(ele, url, { width })
 }
 
 export function copyToClipboard(text: string) {

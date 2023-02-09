@@ -2,18 +2,19 @@
   <div class="work-detail-container">
     <a-row type="flex" justify="center" v-if="template">
       <a-col :span="8" class="cover-img">
-        <img :src="template.coverImg" alt="">
+        <img alt="慕课乐高" src="../assets/logo2.png" id="logo-img" />
+        <a :href="template.coverImg"><img :src="template.coverImg" alt="" id="cover-img"></a>
       </a-col>
       <a-col :span="8">
-        <h2>{{template.title}}</h2>
-        <p>{{template.title}}</p>
+        <h2>{{ template.title }}</h2>
+        <p>{{ template.desc }}</p>
         <div class="author">
           <a-avatar>V</a-avatar>
-          模板由<b>{{template.author}}</b>创建
+          模板由<b>{{ template.author }}</b>创建
         </div>
         <div class="bar-code-area">
           <span>扫一扫，手机预览</span>
-          <div ref="container"></div>
+          <canvas id="barcode-container"></canvas>
         </div>
         <div class="use-btn">
           <router-link to="/editor">
@@ -21,8 +22,8 @@
               使用模板
             </a-button>
           </router-link>
-          <a-button size="large" class="load-btn">
-              下载图片海报
+          <a-button size="large" @click="download" class="load-btn">
+            下载图片海报
           </a-button>
         </div>
       </a-col>
@@ -31,44 +32,76 @@
 </template>
 
 <script lang="ts">
-import { defineComponent,computed } from 'vue';
-import {useRoute} from 'vue-router'
-import {useStore} from 'vuex'
-import {GlobalDataProps} from '../store/index'
-import {TemplateProps} from '../store/templates'
+import { defineComponent, computed, onMounted, nextTick } from 'vue';
+import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '../store/index'
+import { TemplateProps } from '../store/templates'
+import { baseH5URL } from '../main'
+import { generateQRCode } from '../helper'
+
 export default defineComponent({
-  name: 'template-detail',
-  setup(){
+  setup() {
     const route = useRoute()
     const store = useStore<GlobalDataProps>()
-    const id = route.params.id as string
-    const template = computed<TemplateProps>(()=> store.getters.getTemplateById(parseInt(id)))
-    return{
-      template
+    const currentId = route.params.id as string
+    const template = computed<TemplateProps>(() => store.getters.getTemplateById(parseInt(currentId)))
+    const channelURL = computed(() => `${baseH5URL}/p/${template.value.id}-${template.value.uuid}`)
+    onMounted(async () => {
+      await store.dispatch('fetchTemplate', { urlParams: { id: currentId } })
+      await nextTick()
+      await generateQRCode('barcode-container', channelURL.value, 150)
+    })
+
+    const download = () => {
+      // 适用于同源url图片下载
+      const image = document.getElementById('cover-img') as HTMLImageElement
+      // 创建链接
+      const link = document.createElement('a')
+      // 设置链接属性
+      link.href = image.src
+      link.download = 'test.png'
+      link.rel = 'noopener'
+      // 触发事件
+      link.dispatchEvent(new MouseEvent('click'))
+    }
+    return {
+      template,
+      download
     }
   }
 });
 </script>
 <style>
-.work-detail-container{
+.work-detail-container {
   margin-top: 50px;
 }
-.cover-img{
+
+.cover-img {
   margin-right: 30px;
 }
-.cover-img img{
+
+.cover-img img {
   width: 100%;
 }
-.use-btn{
+
+.use-btn {
   margin: 30px 0;
 }
-.ant-avatar{
+
+.ant-avatar {
   margin-right: 10px;
 }
+
 .bar-code-area {
   margin: 20px 0;
 }
-.load-btn{
+
+#barcode-container {
+  display: block;
+}
+
+.load-btn {
   margin-left: 20px;
 }
 </style>
