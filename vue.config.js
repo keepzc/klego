@@ -1,5 +1,8 @@
+const webpack = require('webpack')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const isStaging = !!process.env.VUE_APP_STAGINE
 const isProduction = process.env.NODE_ENV === 'production'
+const isAnalyzeMode = !!process.env.ANALYZE_MODE
 
 module.exports ={
     // 生产环境要使用 OSS 地址
@@ -15,6 +18,15 @@ module.exports ={
               javascriptEnabled: true
             }
           }
+        }
+    },
+    configureWebpack: config => {
+        if(isAnalyzeMode){
+            config.plugins.push(
+                new BundleAnalyzerPlugin({
+                    analyzerMode: 'static'
+                })
+            )
         }
     }
 }
