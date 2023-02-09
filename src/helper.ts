@@ -130,3 +130,32 @@ export function timeout(ms: number) {
 export const objectToQueryString =(queryObject: {[key: string]: any})=>{
     return Object.keys(queryObject).map(key=> `${key}=${queryObject[key]}`).join('&')
 }
+
+export const downloadFile = (src: string, fileName = 'default.png') => {
+    // 创建链接
+    const link = document.createElement('a')
+    // 设置链接属性
+    link.download = fileName
+    link.rel = 'noopener'
+    if(link.origin !== location.origin){
+        //https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/responseType
+        // 跨域
+        axios.get(src, {responseType: 'blob'}).then( data =>{
+            link.href = URL.createObjectURL(data.data)
+            setTimeout(() => { link.dispatchEvent(new MouseEvent('click'))})
+            // https://developer.mozilla.org/zh-CN/docs/Web/API/URL/revokeObjectURL
+            // 释放由 createObjectURL 创建的对象
+            setTimeout(() => { URL.revokeObjectURL(link.href)}, 10000 )
+        }).catch(err=>{
+            console.error(err)
+            link.target='_blank'
+            link.href= src
+            link.dispatchEvent(new MouseEvent('click'))
+        })
+    }else {
+        link.href = src
+        // 触发事件
+        link.dispatchEvent(new MouseEvent('click'))
+    }
+    
+}

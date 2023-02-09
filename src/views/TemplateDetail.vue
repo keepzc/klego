@@ -2,7 +2,6 @@
   <div class="work-detail-container">
     <a-row type="flex" justify="center" v-if="template">
       <a-col :span="8" class="cover-img">
-        <img alt="慕课乐高" src="../assets/logo2.png" id="logo-img" />
         <a :href="template.coverImg"><img :src="template.coverImg" alt="" id="cover-img"></a>
       </a-col>
       <a-col :span="8">
@@ -38,7 +37,7 @@ import { useStore } from 'vuex'
 import { GlobalDataProps } from '../store/index'
 import { TemplateProps } from '../store/templates'
 import { baseH5URL } from '../main'
-import { generateQRCode } from '../helper'
+import { generateQRCode, downloadFile } from '../helper'
 
 export default defineComponent({
   setup() {
@@ -54,16 +53,7 @@ export default defineComponent({
     })
 
     const download = () => {
-      // 适用于同源url图片下载
-      const image = document.getElementById('cover-img') as HTMLImageElement
-      // 创建链接
-      const link = document.createElement('a')
-      // 设置链接属性
-      link.href = image.src
-      link.download = 'test.png'
-      link.rel = 'noopener'
-      // 触发事件
-      link.dispatchEvent(new MouseEvent('click'))
+      downloadFile(template.value.coverImg)
     }
     return {
       template,
