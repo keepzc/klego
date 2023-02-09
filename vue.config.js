@@ -53,5 +53,12 @@ module.exports ={
                 }
             }
         }
+    },
+    chainWebpack: config => {
+        config.plugin('html').tap(args => {
+            args[0].title = '慕课乐高'
+            args[0].desc = '一键生成 H5 海报'
+            return args
+        })
     }
 }
