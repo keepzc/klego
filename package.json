@@ -50,6 +50,8 @@
     "eslint-plugin-vue": "^7.0.0-0",
     "flush-promises": "^1.0.2",
     "jest": "^27.0.5",
+    "less": "^3.13.1",
+    "less-loader": "^7.1.0",
     "rgb-hex": "^4.0.0",
     "sass": "^1.32.5",
     "sass-loader": "^10.2.0",
