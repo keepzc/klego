@@ -1,5 +1,5 @@
 import { onMounted, onUnmounted } from 'vue'
-const useKeyPress = (key:string, cb:()=> any) => {
+const useKeyPress = (key: string, cb: () => any) => {
     const trigger = (event: KeyboardEvent) => {
         if(event.key === key){
             cb()

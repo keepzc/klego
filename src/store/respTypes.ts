@@ -14,13 +14,13 @@ export interface ListData<T> {
 
 export interface WorkData extends Omit<PageData, 'props'> {
     content: {
-        components: ComponentData[],
-        props?:  PageProps
-    }
+        components: ComponentData[];
+        props?:  PageProps;
+    };
 }
 
 export interface UploadData {
-    urls: string[]
+    urls: string[];
 }
 
 export type RespListData<T> = RespData<ListData<T>>
