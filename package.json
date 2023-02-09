@@ -47,6 +47,7 @@
     "@vue/test-utils": "2.0.0-beta.14",
     "@vue/vue3-jest": "^27.0.0-alpha.1",
     "babel-jest": "^27.0.6",
+    "compression-webpack-plugin": "^6.0.3",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
     "flush-promises": "^1.0.2",

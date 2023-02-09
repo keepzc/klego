@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const isStaging = !!process.env.VUE_APP_STAGINE
 const isProduction = process.env.NODE_ENV === 'production'
 const isAnalyzeMode = !!process.env.ANALYZE_MODE
@@ -32,6 +33,15 @@ module.exports ={
             config.plugins.push(
                 new BundleAnalyzerPlugin({
                     analyzerMode: 'static'
+                })
+            )
+        }
+        if(isProduction){
+            config.plugins.push(
+                new CompressionWebpackPlugin({
+                    algorithm: 'gzip',
+                    test: /\.js$|\.html$|\.json$|\.css/,
+                    threshold: 10240,
                 })
             )
         }
