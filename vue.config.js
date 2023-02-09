@@ -35,5 +35,24 @@ module.exports ={
                 })
             )
         }
+        config.optimization.splitChunks = {
+            maxInitialRequests: Infinity,
+            minSize: 0,
+            chunks: 'all',
+            cacheGroups: {
+                antVendor: {
+                    name: 'ant-design-vue',
+                    test: /[\\/]node_modules[\\/](ant-design-vue)[\\/]/,
+                },
+                canvansVendor: {
+                    name: 'html2canvas',
+                    test: /[\\/]node_modules[\\/](html2canvas)[\\/]/,
+                },
+                vendor: {
+                    name: 'vendor',
+                    test: /[\\/]node_modules[\\/](!html2canvas)(!ant-design-vue)[\\/]/,
+                }
+            }
+        }
     }
 }
